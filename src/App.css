@@ -1,0 +1,91 @@
+/* Global Styling */
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background-color: #ffffff;
+  scrollbar-width: none; /* Firefox support */
+  -ms-overflow-style: none; /* IE/Edge support */
+}
+
+/* Modern scrollbar styling (for browsers that support it) */
+body::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+/* Scrollable containers within your app */
+.scrollable {
+  overflow-y: auto;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent; /* Firefox */
+}
+
+.scrollable::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollable::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  body {
+    align-items: flex-start;
+    overflow-y: auto; /* Allow vertical scrolling on mobile */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  }
+
+  #root {
+    width: 100%;
+    height: auto;
+  }
+
+  /* More subtle scrollbar on mobile */
+  body::-webkit-scrollbar {
+    width: 4px;
+  }
+}
+
+/* Optional: Selection styling 
+::selection {
+  background: rgba(255, 192, 203, 0.5); /* Light pink with transparency 
+  color: #000;
+}*/
+
+/* For Firefox */
+::-moz-selection {
+  background: rgba(255, 192, 203, 0.5);
+  color: #000;
+}

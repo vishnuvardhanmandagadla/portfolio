@@ -1,0 +1,469 @@
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+  
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
+  
+  @keyframes checkmark-circle {
+    0% { stroke-dashoffset: 166; }
+    100% { stroke-dashoffset: 0; }
+  }
+  
+  @keyframes checkmark {
+    0% { stroke-dashoffset: 48; }
+    100% { stroke-dashoffset: 0; }
+  }
+  
+  .contact-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    background: white;
+    overflow: hidden;
+  }
+  
+  .contact-circle-container {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    z-index: 10;
+  }
+  
+  .circle-outer {
+    width: 100%;
+    height: 100%;
+    border: 3px solid #55062d;
+    border-radius: 50%;
+    cursor: pointer;
+    background: transparent;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    box-shadow: 0 10px 30px rgba(85, 6, 45, 0.1);
+  }
+  
+  .circle-outer:hover {
+    border-color: #802754;
+    transform: scale(1.05);
+    box-shadow: 0 15px 40px rgba(128, 39, 84, 0.2);
+  }
+  
+  .circle-inner {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #660033, #802754);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(128, 39, 84, 0.4), 
+                inset 0 0 15px rgba(236, 197, 221, 0.4);
+    transition: all 0.3s ease-out;
+  }
+  
+  .circle-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  
+  .mail-icon {
+    font-size: 2rem;
+    color: white;
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  .circle-text {
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-align: center;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+  
+  .contact-form-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(243, 219, 234, 0);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    clip-path: circle(0% at 50% 50%);
+    transition: clip-path 0.8s cubic-bezier(0.86, 0, 0.07, 1), 
+                background 0.4s ease;
+    z-index: 1001;
+    perspective: 1000px;
+  }
+  
+  .contact-form-overlay.show {
+    clip-path: circle(150% at 50% 50%);
+    background: rgba(96, 10, 56, 0.631);
+  }
+  .contact-form-overlay h3 {
+  color: #802754; /* Thick color for "Contact Us" text */
+}
+
+.contact-form input,
+.contact-form textarea {
+  color: #34091e;       /* Thick input text color */
+  caret-color: #802754; /* Thick caret (cursor) color */
+}
+  
+  .contact-form {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 25px 50px rgba(102, 0, 51, 0.2);
+    border: 1px solid rgba(236, 197, 221, 0.8);
+    text-align: center;
+    opacity: 0;
+    transform: translateY(20px) rotateX(-10deg);
+    transition: opacity 0.4s 0.3s ease-in-out, 
+                transform 0.4s 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+  }
+  
+  .contact-form-overlay.show .contact-form {
+    opacity: 1;
+    transform: translateY(0) rotateX(0);
+  }
+  
+  .input-group {
+    position: relative;
+    margin: 15px 0;
+  }
+  
+  .input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #802754;
+    font-size: 1.1rem;
+  }
+  
+  .contact-form input, 
+  .contact-form textarea {
+    width: 100%;
+    padding: 14px 14px 14px 40px;
+    margin: 5px 0;
+    border: 1px solid #ecc5dd;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: rgba(236, 197, 221, 0.1);
+  }
+  
+  .contact-form textarea {
+    min-height: 120px;
+    padding-top: 14px;
+    resize: vertical;
+  }
+  
+  .contact-form input:focus, 
+  .contact-form textarea:focus {
+    border-color: #802754;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(128, 39, 84, 0.2);
+    background-color: white;
+  }
+  
+  .contact-form button {
+    background: linear-gradient(135deg, #55062d, #802754);
+    color: white;
+    padding: 14px 28px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(85, 6, 45, 0.3);
+  }
+  
+  .contact-form button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(128, 39, 84, 0.4);
+  }
+  
+  .contact-form button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  
+  .send-icon {
+    font-size: 1.1rem;
+  }
+  
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    color: #55062d;
+    transition: all 0.3s ease;
+    padding: 5px;
+    border-radius: 50%;
+  }
+  
+  .close-btn:hover {
+    color: #802754;
+    transform: rotate(90deg);
+  }
+  
+  .success-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .success-animation {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 20px;
+  }
+  
+  .checkmark {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: block;
+    stroke-width: 4;
+    stroke: #55062d;
+    stroke-miterlimit: 10;
+    box-shadow: inset 0 0 0 rgba(85, 6, 45, 0.1);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  
+  .checkmark-circle {
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    stroke-width: 4;
+    stroke-miterlimit: 10;
+    stroke: #55062d;
+    fill: none;
+    animation: checkmark-circle 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+  }
+  
+  .checkmark-check {
+    transform-origin: 50% 50%;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: checkmark 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+  }
+  
+  .success-message h3 {
+    color: #55062d;
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+  }
+  
+  .success-message p {
+    color: #666;
+    margin-bottom: 20px;
+  }
+  
+  .success-close-btn {
+    background: #55062d;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .success-close-btn:hover {
+    background: #802754;
+    transform: translateY(-2px);
+  }
+  
+  .spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+
+  /* Drawing Animation Styles */
+.drawing-success-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.drawing-animation {
+  width: 300px;
+  height: 180px;
+  margin: 0 auto;
+}
+
+.drawing-animation path {
+  fill-opacity: 0;
+  stroke: #7e023e;
+  stroke-width: 3;
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: #7e023e;
+}
+
+.drawing-animation path:nth-child(1) {
+  animation: 
+    drawStroke 4s ease-in-out 1s forwards, /* Added 1s delay */
+    fadeFill 2s ease-in 3s forwards; /* Adjusted to 3s (1s + 2s) */
+}
+
+.drawing-animation path:nth-child(2) {
+  animation: 
+    drawStroke 4s ease-in-out 1.3s forwards, /* Added 1s + 0.3s delay */
+    fadeFill 2s ease-in 3.3s forwards; /* Adjusted to 3.3s (1s + 2.3s) */
+}
+
+.drawing-animation path:nth-child(3) {
+  animation: 
+    drawStroke 4s ease-in-out 1.6s forwards, /* Added 1s + 0.6s delay */
+    fadeFill 2s ease-in 3.6s forwards; /* Adjusted to 3.6s (1s + 2.6s) */
+}
+
+@keyframes drawStroke {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes fadeFill {
+  from { fill-opacity: 0; }
+  to { fill-opacity: 1; }
+}
+
+.drawing-success-message {
+  width: 100%;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  font-size: 24px;
+  color: #7e023e;
+  margin-top: 20px;
+  opacity: 0;
+  animation: fadeIn 1s 5.6s forwards; /* Changed to 5.6s (1s + 4.6s) */
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+.success-close-btn {
+  margin-top: 30px;
+  padding: 10px 20px;
+  background-color: #7e023e;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  opacity: 0;
+  animation: fadeIn 1s 5.6s forwards; /* Changed to 5.6s (1s + 4.6s) */
+}
+
+.success-close-btn:hover {
+  background-color: #5a012c;
+}
+
+
+/* Add these to your ContactUs.css file */
+
+.contact-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.contact-background-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.background-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.background-path {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: drawPath 5s ease-in-out forwards;
+}
+
+.background-text {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: drawText 5s ease-in-out forwards;
+}
+
+@keyframes drawPath {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes drawText {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.contact-circle-container {
+  position: relative;
+  z-index: 10;
+}
+
+/* Rest of your existing CSS... */

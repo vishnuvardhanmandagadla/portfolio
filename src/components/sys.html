@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Realistic Laptop Screen</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #F3DBEA; /* Light background from the palette */
+    }
+
+    svg {
+      width: 800px;
+      height: 600px;
+    }
+
+    /* Laptop screen */
+    .laptop-screen {
+      fill: none;
+      stroke: #660033; /* Dark red from the palette */
+      stroke-width: 8;
+      stroke-dasharray: 2400;  /* Length of the path */
+      stroke-dashoffset: 2400;  /* Start point of the animation */
+      animation: draw 3s ease-in-out forwards;
+    }
+
+    /* Inner reflection */
+    .inner-reflection {
+      fill: rgba(255, 255, 255, 0.2);
+      stroke-dasharray: 1200;
+      stroke-dashoffset: 1200;
+      animation: draw 3s ease-in-out forwards;
+    }
+
+    /* Laptop base */
+    .laptop-base {
+      fill: #994D74; /* Light purple from the palette */
+      stroke-dasharray: 1500;
+      stroke-dashoffset: 1500;
+      animation: draw 6s ease-in-out forwards;
+    }
+
+    /* Thin shadow */
+    .thin-shadow {
+      fill: none;
+      stroke: #B37495; /* Soft purple from the palette */
+      stroke-width: 2;
+      stroke-dasharray: 1200;
+      stroke-dashoffset: 1200;
+      animation: draw 6s ease-in-out forwards;
+    }
+
+    @keyframes draw {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+    <!-- Laptop Screen -->
+    <rect x="100" y="50" width="600" height="400" rx="20" ry="20" class="laptop-screen" />
+
+    <!-- Inner Reflection -->
+    <path d="M100 50 Q400 80 700 50 Q680 250 700 450 Q400 420 100 450 Z" class="inner-reflection" />
+
+    <!-- Laptop Base -->
+    <path d="M50 475 Q400 520 750 475 Q740 490 50 490 Z" class="laptop-base" />
+
+    <!-- Thin Shadow -->
+    <path d="M50 490 Q400 500 750 490" class="thin-shadow" />
+  </svg>
+</body>
+</html>

@@ -1,0 +1,80 @@
+.skills {
+    padding: 50px 20px;
+    text-align: center;
+    background-color: #ffd4ec; /* White background */
+    color: #660033; /* Primary purple for text */
+    height: 750px; /* Fixed height for the component */
+    overflow: hidden;
+    
+  }
+  
+  .skills-heading {
+    font-size: 19rem;
+    font-weight: bold;
+    margin-bottom: 30px;
+    color: #420032;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+  }
+  
+  .skills-letter {
+    display: inline-block;
+  }
+  
+  
+  .skills-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: -330px; /* Adjust the vertical positioning */
+  gap: 20px; /* Add spacing between skill items */
+  transform: scale(1.05); /* Increase the overall size of the list */
+  
+}
+
+  
+  .skill-item {
+    margin: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 1.2rem;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .skill-icon {
+    font-size: 4rem; /* Larger icons */
+    margin-bottom: 8px;
+  }
+  
+  .skill-name {
+    color: #430c27; /* Darker color for skill names */
+  }
+  
+  body {
+    background-color: #fff;
+  }
+  
+  .skill-icon:hover .skill-name {
+    color: #802754; /* Change text color on hover */
+  }
+  
+  @keyframes watermarkEffect {
+  0% {
+    color: #420032;
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    color: #fbb6e4; /* Light pink color */
+    opacity: 0.5; /* Make it faint */
+    transform: scale(1.07); /* Slightly enlarge the text */
+  }
+}
+
+.skills-heading.watermark {
+  animation: watermarkEffect 3s forwards; /* Apply watermark effect */
+}

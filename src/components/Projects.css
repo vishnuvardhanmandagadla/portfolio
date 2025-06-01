@@ -1,0 +1,130 @@
+.project-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  background: linear-gradient(135deg, #330026, #660033);
+  overflow: hidden;
+}
+
+.watermark-text {
+  position: absolute;
+  top: 25%;
+  left: 0;
+  transform: translateY(-50%);
+  padding-left: 1rem; /* Adjust based on actual left spacing */
+  font-size: 18rem;
+  font-weight: 700;
+  color: #fbb6e4;
+  z-index: 0;
+  opacity: 0.2;
+  text-transform: uppercase;
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+  line-height: 1;
+}
+
+
+.grid {
+  display: grid;
+}
+
+.text-4xl {
+  font-size: 2.25rem;
+}
+
+.sm\:text-7xl {
+  font-size: 4.5rem;
+}
+
+.md\:text-8xl {
+  font-size: 6rem;
+}
+
+.lg\:text-9xl {
+  font-size: 8rem;
+}
+
+.font-black {
+  font-weight: bold;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.relative {
+  position: relative;
+}
+
+/* Key fix for hiding overflow properly */
+.overflow-hidden {
+  overflow: hidden;
+  height: 1em; /* Match the line height */
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.inset-0 {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.first-layer span {
+  color: #ddb5cc;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.text-pink-200 {
+  color: #fbcfe8;
+}
+
+/* Link icon styles */
+.link-icon-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.link-icon {
+  color: #f9a8d4;
+  font-size: 0.8em;
+  transition: all 0.3s ease;
+}
+
+.group:hover .link-icon {
+  font-weight: bold;
+  transform: scale(1.2);
+}
+
+.group:hover .first-layer span {
+  color: #f9a8d4;
+}
+
+/* Ensure proper spacing and height for all characters */
+.first-layer, .absolute {
+  letter-spacing: 1px;
+  height: 1em;
+}
+
+.first-layer span, .absolute span {
+  height: 100%;
+  vertical-align: top;
+}
+

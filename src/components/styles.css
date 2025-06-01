@@ -1,0 +1,63 @@
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  background-color: #F3DBEA; /* Soft pink */
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+.container {
+  animation: fadeIn 1.5s ease-in-out;
+}
+
+.laptop-screen-back,
+.laptop-screen-bezel,
+.laptop-screen-inner-border,
+.laptop-base,
+.keyboard-keys rect,
+.laptop-trackpad {
+  stroke-dasharray: 1500;
+  stroke-dashoffset: 1500;
+  animation: draw 2.5s linear forwards;
+}
+
+.laptop-screen-back {
+  animation-delay: 0.2s;
+}
+
+.laptop-screen-bezel {
+  animation-delay: 0.5s;
+}
+
+.laptop-screen-inner-border {
+  animation-delay: 0.8s;
+}
+
+.laptop-base {
+  animation-delay: 1.1s;
+}
+
+.keyboard-keys rect {
+  animation-delay: 1.4s;
+}
+
+.laptop-trackpad {
+  animation-delay: 1.8s;
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

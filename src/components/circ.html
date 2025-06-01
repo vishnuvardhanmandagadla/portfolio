@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rotating Circle Navigation</title>
+  <link href="https://fonts.googleapis.com/css?family=Economica:400,700" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      height: 100vh; /* Full viewport height */
+      background: #c0392b;
+      font-family: 'Economica', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      -webkit-backface-visibility: hidden;
+      overflow: hidden; /* Hide scroll bar */
+    }
+
+    #circle {
+      width: 400px;
+      height: 400px;
+      border-radius: 200px;
+      border: 2px solid #fff;
+      position: absolute;
+      left: -250px;
+    }
+
+    .circle-container {
+      position: absolute;
+      top: 90%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    a {
+      display: inline-block;
+      text-decoration: none;
+      color: #fff;
+      position: absolute;
+      z-index: 100;
+    }
+
+    .image-container {
+      position: absolute;
+      top: 50%;
+      left: calc(100% - 40px); /* Move the image 20px to the left */
+      transform: translate(-50%, -50%);
+      display: none; /* Hide the image initially */
+      z-index: 100;
+    }
+
+    .image-container img {
+      width: 150px;
+      height: 150px;
+    }
+  </style>
+</head>
+<body>
+  <div id="circle" class="circle-container"></div>
+  <div class="image-container" id="image-container">
+    <img id="image" src="" alt="Image">
+  </div>
+
+  <script>
+    var links = [
+      {label: 'link1', bg: '#c0392b', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQATNcqNovQbIK1Dy4xJn2Re4jnvGaql0UIFQ&s'}, 
+      {label: 'link2', bg: '#16a085', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMpLceWP8kVKmXyrSmPNj2Y7k-a5zzXmPOLw&s'}, 
+      {label: 'link3', bg: '#8e44ad', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHts4mqqAOWk2RyVBWwY1ZF8h7DHm3h-jZaA&s'}, 
+      {label: 'link4', bg: '#27ae60', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYYGBKYCpP28MVZ4fKB5uaOSGodPWtLD0OCw&s'}, 
+      {label: 'link5', bg: '#f39c12', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRX-UBzAtoNsRtz5CVFikQIRduAqs3ohiqOuA&s'}, 
+      {label: 'link6', bg: '#2980b9', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQb5-bfi9GBnqIFslX6pF71MJksKagtQPGA8w&s'},
+      {label: 'link7', bg: '#8e44ad', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR0-ykDdgqZnE1LmOEwV24kUBA_nVsbVBEOg&s'},
+      {label: 'link8', bg: '#c0392b', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQG6nlIoIsIvrxRzzXkdmCP_7qxByp2oNa3CQ&s'},
+      {label: 'link9', bg: '#16a085', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKneVQp39R5hOTswi4ZQXkn-Y8LzG_CsVhyQ&s'},
+      {label: 'link10', bg: '#f39c12', image: 'https://via.placeholder.com/150?text=Image+10'}
+    ]; 
+
+    var windowHeight = window.innerHeight;
+    if (windowHeight === 0) windowHeight = 238;
+    var radius = windowHeight * 0.6,
+        circle = document.createElement('div'),
+        borderSize = radius * 0.021;
+    var totalArea = 48, 
+        increment = totalArea / (links.length - 1),
+        startPoint = 0 - (totalArea / 2),
+        fontSize = radius * 0.12,
+        linkSize = radius * 0.25;
+
+    styleCircle();
+    addCircle();
+    addLinks();
+    styleLinks();
+
+    function styleCircle() {
+      circle.style.border = borderSize + 'px solid #fff';
+      circle.style.width = radius * 2 + 'px';
+      circle.style.height = radius * 2 + 'px';
+      circle.style.borderRadius = radius + 'px';
+      circle.style.position = 'absolute';
+      circle.style.top = '-' + radius * 0.2 + 'px';
+      circle.style.left = radius * -1 + 'px';
+    }
+
+    function addCircle() {
+      document.body.appendChild(circle);
+    }
+
+    function addLinks() {
+      for (var i = 0, l = links.length; i < l; i++) {
+        var link = document.createElement('a'),
+            hover = document.createElement('span');
+        link.href = "#";
+        link.dataset.color = links[i].bg;
+        link.style.display = 'inline-block';
+        link.style.textDecoration = 'none';
+        link.style.color = '#fff';
+        link.style.position = 'absolute';
+        link.style.zIndex = 100;
+        link.innerHTML = links[i].label;
+        hover.style.position = 'absolute';
+        hover.style.display = 'inline-block';
+        hover.style.zIndex = 50;
+        hover.style.opacity = 0;
+        document.body.appendChild(link);
+        document.body.appendChild(hover);
+        link.addEventListener('mouseover', linkOver);
+        link.addEventListener('mouseout', linkOut);
+        links[i].elem = link;
+        links[i].hover = hover;
+      }
+    }
+
+    function styleLinks() {
+      for (var i = 0, l = links.length; i < l; i++) {
+        var link = links[i].elem, hover = links[i].hover, deg = startPoint + (i * (360 / links.length));
+        link.style.paddingLeft = radius * 1.2 + 'px';
+        link.style.fontSize = fontSize + 'px';
+        link.style.height = linkSize + 'px';
+        link.style.lineHeight = linkSize + 'px';
+        setTransformOrigin(link, '0px ' + linkSize * 0.5 + 'px');
+        setTransition(link, 'all 0.2s ease-out');
+        setTransform(link, 'rotate(' + deg + 'deg)');
+        link.style.left = borderSize + 'px';
+        link.style.top = (windowHeight / 2) - (windowHeight * 0.1) + borderSize + 'px';
+
+        hover.style.left = borderSize + 'px';
+        setTransformOrigin(hover, '0px ' + linkSize * 0.5 + 'px');
+        setTransition(hover, 'all 0.2s ease-out');
+        setTransform(hover, 'rotate(' + deg + 'deg)');
+        hover.style.top = (windowHeight * 0.4) + borderSize + 'px';
+        hover.style.width = radius + (borderSize / 2) + 'px';
+        hover.style.height = linkSize + 'px';
+        hover.style.borderRight = borderSize * 2 + 'px solid #fff';
+      }
+    }
+
+    window.onresize = function () {
+      windowHeight = window.innerHeight;
+      radius = windowHeight * 0.6;
+      borderSize = radius * 0.021;
+      fontSize = radius * 0.12;
+      linkSize = radius * 0.25;
+      styleCircle();
+      styleLinks();
+    };
+
+    // Event listener for mouse wheel to rotate the circle
+    var currentRotation = 0;
+    window.addEventListener('wheel', function (e) {
+      var delta = e.deltaY || e.detail || e.wheelDelta;
+      currentRotation += delta * 0.1; // Adjust the rotation speed with delta
+      setTransform(circle, 'rotate(' + currentRotation + 'deg)'); // Rotate the circle
+
+      for (var i = 0, l = links.length; i < l; i++) {
+        var link = links[i].elem;
+        var linkRotation = currentRotation + (i * (360 / links.length)); // Adjust rotation for each link
+        setTransform(link, 'rotate(' + linkRotation + 'deg)');
+      }
+
+      // Check for links in the 2-4 o'clock range (60 to 120 degrees) and 7-9 o'clock range (240 to 300 degrees)
+      var indexInTwoToFourOClock = null;
+      for (var i = 0, l = links.length; i < l; i++) {
+        var linkRotation = (currentRotation + (i * (360 / links.length))) % 360; // Rotation for each link
+
+        // Adjust the range to be more lenient and cover a larger portion of the circle
+        if ((linkRotation >= 60 && linkRotation <= 120) || (linkRotation >= 240 && linkRotation <= 300)) {
+          indexInTwoToFourOClock = i;
+          break; // Stop at the first link found in this range
+        }
+      }
+
+      // Update the image based on the link in the 2-4 o'clock or 7-9 o'clock position
+      if (indexInTwoToFourOClock !== null) {
+        updateImage(indexInTwoToFourOClock);
+      } else {
+        // Hide the image if no link is found in the 2-4 o'clock or 7-9 o'clock position
+        document.getElementById('image-container').style.display = 'none';
+      }
+    });
+
+    function updateImage(index) {
+      document.getElementById('image').src = links[index].image;
+      document.getElementById('image-container').style.display = 'block';
+    }
+
+    function setTransformOrigin(elem, transformOrigin) {
+      elem.style.transformOrigin = transformOrigin;
+    }
+
+    function setTransition(elem, transition) {
+      elem.style.transition = transition;
+    }
+
+    function setTransform(elem, transform) {
+      elem.style.transform = transform;
+    }
+
+    function linkOver() {
+      var hover = this.hover;
+      hover.style.opacity = 1;
+    }
+
+    function linkOut() {
+      var hover = this.hover;
+      hover.style.opacity = 0;
+    }
+  </script>
+</body>
+</html>
+
+import React, { useEffect, useState } from "react";
+import Navbar from './Navbar';
+import Hero from './Hero';
+import About from './About';
+import Skills from './Skills';
+import Projects from './Projects';
+import Contact from './Contacts';
+import Footer from './Footer';
+import MouseFollower from "./MouseFollower";
+import SkillsHeading from "./Skillsheading";
+
+const MainCo = () => {
+  const [scrollPosition, setScrollPosition] = useState(0);
+
+  // Function to handle scroll
+  const handleScroll = () => {
+    setScrollPosition(window.scrollY);
+  };
+
+  // Using useEffect to add event listener for smooth scroll
+  useEffect(() => {
+    // Set up scroll event listener for smoother scroll effect
+    const smoothScroll = () => {
+      requestAnimationFrame(() => {
+        setScrollPosition(window.scrollY);
+      });
+    };
+    
+    window.addEventListener('scroll', smoothScroll);
+    return () => window.removeEventListener('scroll', smoothScroll);
+  }, []);
+
+  return (
+    <>
+      {/* Navbar */}
+      <Navbar />
+
+      {/* Hero Section with custom parallax */}
+      <div 
+        style={{
+          transform: `translateY(${scrollPosition * 0.7}px)`,
+          transition: "transform 0.1s ease-out"
+        }}>
+        <Hero />
+      </div>
+
+      {/* About Section with custom parallax */}
+      <div 
+        style={{
+          transform: `translateY(${scrollPosition * 0.6}px)`,
+          transition: "transform 0.1s ease-out"
+        }}>
+        <About />
+      </div>
+
+      {/* Skills Section with custom parallax */}
+      <div 
+        style={{
+          transform: `translateY(${scrollPosition * 0.5}px)`,
+          transition: "transform 0.1s ease-out"
+        }}>
+        <Skills />
+      </div>
+
+      {/* Projects Section with custom parallax */}
+      <div 
+        style={{
+          transform: `translateY(${scrollPosition * 0.7}px)`,
+          transition: "transform 0.1s ease-out"
+        }}>
+        <Projects />
+      </div>
+
+      {/* Contact Section with custom parallax */}
+      <div 
+        style={{
+          transform: `translateY(${scrollPosition * 0.6}px)`,
+          transition: "transform 0.1s ease-out"
+        }}>
+        <Contact />
+      </div>
+
+      {/* Footer Section with custom parallax */}
+      <div 
+        style={{
+          transform: `translateY(${scrollPosition * 0.5}px)`,
+          transition: "transform 0.1s ease-out"
+        }}>
+        <Footer />
+      </div>
+
+      {/* Custom Mouse Follower */}
+      <MouseFollower />
+    </>
+  );
+};
+
+export default MainCo;

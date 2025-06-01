@@ -1,0 +1,145 @@
+/* General Navbar Styling */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #420032;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+.navbar.hide {
+  transform: translateY(-100%);
+}
+
+.navbar.show {
+  transform: translateY(0);
+}
+
+/* Navbar Container */
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  height: 70px;
+}
+
+/* Logo Styling */
+.logo {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #f3e9f1;
+  cursor: pointer;
+}
+
+/* Nav Links */
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 20px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.nav-links li {
+  position: relative;
+}
+
+.nav-links li a {
+  position: relative;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #f3e9f1;
+  transition: color 0.3s ease;
+  padding-bottom: 5px;
+  display: inline-block;
+}
+
+.nav-links li a:hover {
+  color: #e1c4d5;
+}
+
+/* Progress Mask Effect */
+.progress-mask {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background-color: #e1c4d5;
+  transition: width 0.2s ease-out;
+  z-index: 1;
+}
+
+.nav-links li.active a {
+  color: #ffffff;
+}
+
+.nav-links li.active .progress-mask {
+  background-color: #ffffff;
+  height: 3px;
+}
+
+/* Mobile Menu Toggle */
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.menu-toggle span {
+  display: block;
+  width: 25px;
+  height: 3px;
+  background-color: #f3e9f1;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.menu-toggle.open span:nth-child(1) {
+  transform: rotate(45deg) translateY(8px);
+}
+
+.menu-toggle.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-toggle.open span:nth-child(3) {
+  transform: rotate(-45deg) translateY(-8px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: flex;
+  }
+
+  .nav-links {
+    position: absolute;
+    top: 70px;
+    right: 0;
+    background-color: #330026;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+    width: 200px;
+    transform: translateX(100%);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+  }
+
+  .nav-links.open {
+    transform: translateX(0);
+  }
+
+  .nav-links li {
+    text-align: right;
+  }
+
+  .nav-links li a {
+    padding-bottom: 3px;
+  }
+}

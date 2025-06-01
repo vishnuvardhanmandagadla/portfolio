@@ -1,0 +1,38 @@
+.circle-container {
+  position: relative;
+  height: 100vh; /* Full viewport height */
+  width: 98.8vw; /* Full viewport width */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffffff;
+}
+
+.circle-border {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  background-color: transparent;
+  border: 5px solid #440546; /* The fixed border color */
+  border-radius: 50%;
+  
+  transition: border 1.5s ease-out; /* Smooth transition for border disappearance */
+}
+
+.circle-border.no-border {
+  border: none; /* Removes the border when mouse is near */
+}
+
+.circle-inner {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #b60884; /* Color inside the circle */
+  border-radius: 50%;
+  transition: transform 0.15s ease-out; /* Smooth transition */
+}
+
+.circle-inner.near {
+  transition: transform 0.5s ease-out; /* Smoother and quicker transition when near */
+}
+
