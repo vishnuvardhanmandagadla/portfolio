@@ -1,15 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FiMail, FiX, FiUser, FiMessageSquare, FiSend } from 'react-icons/fi';
+import { FiMail, FiX, FiUser, FiMessageSquare, FiSend, FiTag, FiChevronDown, FiCheck } from 'react-icons/fi';
+import { useForm, ValidationError } from '@formspree/react';
 import './ContactUs.css';
 
 const ContactCircle = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [pathLength, setPathLength] = useState(0);
+  const [state, handleSubmit] = useForm("xldovpjy");
+  const [selectedSubject, setSelectedSubject] = useState("");
+  const [customSubject, setCustomSubject] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const circleRef = useRef(null);
-  const textPathRef = useRef(null);
   const mousePos = useRef({ x: 0, y: 0 });
   const animationId = useRef(null);
 
@@ -71,90 +73,61 @@ const ContactCircle = () => {
   }, [isExpanded]);
 
   useEffect(() => {
-    // Animate the text drawing effect
-    let animationFrame;
-    let startTime = null;
-    const duration = 2000; // 2 seconds
-
-    const animateDrawing = (timestamp) => {
-      if (!startTime) startTime = timestamp;
-      const elapsed = timestamp - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      
-      setPathLength(progress);
-      
-      if (progress < 1) {
-        animationFrame = requestAnimationFrame(animateDrawing);
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
       }
     };
 
-    animationFrame = requestAnimationFrame(animateDrawing);
-    
-    return () => cancelAnimationFrame(animationFrame);
-  }, []);
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
 
   const handleClick = () => {
     setIsExpanded(true);
-    setSubmitSuccess(false);
   };
 
   const handleClose = () => {
     setIsExpanded(false);
     setPosition({ x: 0, y: 0 });
+    setSelectedSubject("");
+    setCustomSubject("");
+    setIsDropdownOpen(false);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setSubmitSuccess(true);
-      e.target.reset();
-    }, 1500);
+  const handleSubjectSelect = (value) => {
+    setSelectedSubject(value);
+    setIsDropdownOpen(false);
+    if (value !== "Other") {
+      setCustomSubject("");
+    }
+  };
+
+  const subjectOptions = [
+    "Job Inquiry",
+    "Project Collaboration",
+    "Freelance Opportunity",
+    "General Question",
+    "Partnership Proposal",
+    "Technical Support",
+    "Feedback",
+    "Other"
+  ];
+
+  const onSubmit = (e) => {
+    handleSubmit(e);
   };
 
   return (
     <div className="contact-container">
-      {/* Animated Background Text */}
-      <div className="contact-background-text">
-        <svg 
-          className="background-svg" 
-          viewBox="0 0 1200 300" 
-          preserveAspectRatio="xMidYMid meet"
-        >
-          <defs>
-            <path 
-              id="text-path"
-              d="M100,150 C300,50 500,250 700,150 C900,50 1100,250 1100,150"
-              fill="transparent"
-            />
-          </defs>
-          <path 
-            className="background-path"
-            d="M100,150 C300,50 500,250 700,150 C900,50 1100,250 1100,150"
-            fill="none"
-            stroke="rgba(0,0,0,0.05)"
-            strokeWidth="2"
-          />
-          <text 
-            className="background-text" 
-            textAnchor="middle"
-            fill="transparent"
-            stroke="rgba(0,0,0,0.5)"
-            strokeWidth="1.5"
-            strokeDasharray={pathLength * 1000}
-            strokeDashoffset="0"
-            fontFamily="Arial, sans-serif"
-            fontSize="80"
-            fontWeight="bold"
-          >
-            <textPath xlinkHref="#text-path" startOffset="50%">
-              CONTACT US
-            </textPath>
-          </text>
-        </svg>
+      {/* Static Contact Us Heading */}
+      <div className="contact-heading">
+        <h1>CONTACT US</h1>
       </div>
 
       {/* Contact Circle */}
@@ -186,7 +159,7 @@ const ContactCircle = () => {
             <FiX />
           </button>
           
-          {submitSuccess ? (
+          {state.succeeded ? (
             <div className="drawing-success-container">
               <svg className="drawing-animation" viewBox="0 0 300 180" preserveAspectRatio="xMidYMid meet">  
                 <g transform="translate(0,180) scale(0.1,-0.1)"> 
@@ -206,21 +179,119 @@ const ContactCircle = () => {
           ) : (
             <>
               <h3>Contact Us</h3>
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={onSubmit}>
                 <div className="input-group">
                   <FiUser className="input-icon" />
-                  <input type="text" placeholder="Your Name" required />
+                  <input 
+                    id="name"
+                    type="text" 
+                    name="name"
+                    placeholder="Your Name" 
+                    required
+                    minLength={2}
+                    maxLength={50}
+                    pattern="^[a-zA-Z\s'-]+$"
+                    title="Name should contain only letters, spaces, hyphens, and apostrophes"
+                    autoComplete="name"
+                  />
+                  <ValidationError 
+                    prefix="Name" 
+                    field="name"
+                    errors={state.errors}
+                  />
                 </div>
                 <div className="input-group">
                   <FiMail className="input-icon" />
-                  <input type="email" placeholder="Your Email" required />
+                  <input 
+                    id="email"
+                    type="email" 
+                    name="email"
+                    placeholder="Your Email" 
+                    required
+                    maxLength={100}
+                    pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
+                    title="Please enter a valid email address"
+                    autoComplete="email"
+                  />
+                  <ValidationError 
+                    prefix="Email" 
+                    field="email"
+                    errors={state.errors}
+                  />
+                </div>
+                <div className="input-group">
+                  <FiTag className="input-icon" />
+                  {selectedSubject === "Other" ? (
+                    <input 
+                      id="subject"
+                      type="text" 
+                      name="subject"
+                      placeholder="Please specify your subject"
+                      required
+                      minLength={5}
+                      maxLength={100}
+                      value={customSubject}
+                      onChange={(e) => setCustomSubject(e.target.value)}
+                    />
+                  ) : (
+                    <div className="custom-dropdown" ref={dropdownRef}>
+                      <input
+                        type="hidden"
+                        name="subject"
+                        value={selectedSubject}
+                        required
+                      />
+                      <div 
+                        className="custom-dropdown-trigger"
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                      >
+                        <span className={selectedSubject ? "selected-text" : "placeholder-text"}>
+                          {selectedSubject || "Select Subject"}
+                        </span>
+                        <FiChevronDown className={`dropdown-arrow ${isDropdownOpen ? 'open' : ''}`} />
+                      </div>
+                      {isDropdownOpen && (
+                        <div className="custom-dropdown-menu">
+                          {subjectOptions.map((option) => (
+                            <div
+                              key={option}
+                              className={`custom-dropdown-option ${selectedSubject === option ? 'selected' : ''}`}
+                              onClick={() => handleSubjectSelect(option)}
+                            >
+                              {selectedSubject === option && <FiCheck className="check-icon" />}
+                              <span>{option}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  <ValidationError 
+                    prefix="Subject" 
+                    field="subject"
+                    errors={state.errors}
+                  />
                 </div>
                 <div className="input-group">
                   <FiMessageSquare className="input-icon" />
-                  <textarea placeholder="Your Message" required></textarea>
+                  <textarea 
+                    id="message"
+                    name="message"
+                    placeholder="Your Message" 
+                    required
+                    minLength={10}
+                    maxLength={1000}
+                    rows={5}
+                    title="Message must be between 10 and 1000 characters"
+                  ></textarea>
+                  <ValidationError 
+                    prefix="Message" 
+                    field="message"
+                    errors={state.errors}
+                  />
                 </div>
-                <button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? (
+                <button type="submit" disabled={state.submitting}>
+                  {state.submitting ? (
                     <span className="spinner"></span>
                   ) : (
                     <>

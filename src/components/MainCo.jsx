@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import Hero from './Hero';
 import About from './About';
@@ -8,8 +9,11 @@ import Contact from './Contacts';
 import Footer from './Footer';
 import MouseFollower from "./MouseFollower";
 import Vido from "./video";
+import Privacy from './Privacy';
+import Terms from './Terms';
+import Sitemap from './Sitemap';
 
-const MainCo = () => {
+const PortfolioContent = () => {
   const [scrollY, setScrollY] = useState(0);
   const [deviceType, setDeviceType] = useState('desktop');
 
@@ -49,7 +53,7 @@ const MainCo = () => {
   };
 
   return (
-    <div className="parallax-scene" style={{ position: 'relative' }}>
+    <div className="parallax-scene" style={{ position: 'relative', width: '100%', maxWidth: '100vw', overflowX: 'hidden' }}>
       <Navbar scrollY={scrollY} />
       
       {/* Hero Section */}
@@ -57,7 +61,11 @@ const MainCo = () => {
         transform: `translateY(${getParallaxValue(0.3, sectionOffsets.hero)}px)`,
         transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
         willChange: 'transform',
-        opacity: 1 - Math.min(scrollY / 300, 0.2)
+        opacity: 1 - Math.min(scrollY / 300, 0.2),
+        width: '100%',
+        maxWidth: '100vw',
+        overflowX: 'hidden',
+        boxSizing: 'border-box'
       }}>
         <Hero />
       </div>
@@ -66,7 +74,11 @@ const MainCo = () => {
       <div id="about" style={{
         transform: `translateY(${getParallaxValue(0.2, sectionOffsets.about)}px)`,
         transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-        willChange: 'transform'
+        willChange: 'transform',
+        width: '100%',
+        maxWidth: '100vw',
+        overflowX: 'hidden',
+        boxSizing: 'border-box'
       }}>
         <About />
       </div>
@@ -75,7 +87,11 @@ const MainCo = () => {
       <div id="skills" style={{
         transform: `translateY(${getParallaxValue(0.15, sectionOffsets.skills)}px)`,
         transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-        willChange: 'transform'
+        willChange: 'transform',
+        width: '100%',
+        maxWidth: '100vw',
+        overflowX: 'hidden',
+        boxSizing: 'border-box'
       }}>
         <Skills />
       </div>
@@ -84,7 +100,11 @@ const MainCo = () => {
       <div id="video" style={{
         transform: `translateY(${getParallaxValue(0.1, sectionOffsets.video)}px)`,
         transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-        willChange: 'transform'
+        willChange: 'transform',
+        width: '100%',
+        maxWidth: '100vw',
+        overflowX: 'hidden',
+        boxSizing: 'border-box'
       }}>
         <Vido />
       </div>
@@ -93,7 +113,11 @@ const MainCo = () => {
       <div id="projects" style={{
         transform: `translateY(${getParallaxValue(0.08, sectionOffsets.projects)}px)`,
         transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-        willChange: 'transform'
+        willChange: 'transform',
+        width: '100%',
+        maxWidth: '100vw',
+        overflowX: 'hidden',
+        boxSizing: 'border-box'
       }}>
         <Projects />
       </div>
@@ -103,7 +127,11 @@ const MainCo = () => {
         transform: `translateY(${getParallaxValue(0.12, sectionOffsets.contact)}px)`,
         transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
         willChange: 'transform',
-        minHeight: '100vh'
+        minHeight: '100vh',
+        width: '100%',
+        maxWidth: '100vw',
+        overflowX: 'hidden',
+        boxSizing: 'border-box'
       }}>
         <Contact />
       </div>
@@ -114,13 +142,30 @@ const MainCo = () => {
         transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
         willChange: 'transform',
         position: 'relative',
-        zIndex: 10
+        zIndex: 10,
+        width: '100%',
+        maxWidth: '100vw',
+        overflowX: 'hidden',
+        boxSizing: 'border-box'
       }}>
         <Footer />
       </div>
       
       <MouseFollower />
     </div>
+  );
+};
+
+const MainCo = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<PortfolioContent />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/sitemap" element={<Sitemap />} />
+      </Routes>
+    </Router>
   );
 };
 

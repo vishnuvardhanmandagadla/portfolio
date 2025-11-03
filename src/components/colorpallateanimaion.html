@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pro Classic Animated Curved Color Blocks Wallpaper</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #ffffff;
+      font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    .wallpaper {
+      display: flex;
+      gap: 0;
+      perspective: 1000px;
+    }
+
+    .block {
+      width: 160px;
+      height: 320px;
+      border-radius: 200px;
+      margin-left: -60px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      opacity: 0;
+      transform: translateY(40px);
+      animation: appearOneByOne 0.8s ease-out forwards;
+    }
+
+    @keyframes appearOneByOne {
+      0% {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      60% {
+        opacity: 1;
+        transform: translateY(-10px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Reversed color queue with smoother staggered delays */
+    .block:nth-child(1) { background: #f3dbea; animation-delay: 0.1s; }
+    .block:nth-child(2) { background: #ecc5dd; animation-delay: 0.3s; }
+    .block:nth-child(3) { background: #cc9ab5; animation-delay: 0.5s; }
+    .block:nth-child(4) { background: #b37495; animation-delay: 0.7s; }
+    .block:nth-child(5) { background: #994d74; animation-delay: 0.9s; }
+    .block:nth-child(6) { background: #802754; animation-delay: 1.1s; }
+    .block:nth-child(7) { background: #660033; animation-delay: 1.3s; }
+    .block:nth-child(8) { background: #55062d; animation-delay: 1.5s; }
+    .block:nth-child(9) { background: #430c27; animation-delay: 1.7s; }
+    .block:nth-child(10) { background: #34091e; animation-delay: 1.9s; }
+  </style>
+</head>
+<body>
+  <div class="wallpaper">
+    <div class="block"></div>
+    <div class="block"></div>
+    <div class="block"></div>
+    <div class="block"></div>
+    <div class="block"></div>
+    <div class="block"></div>
+    <div class="block"></div>
+    <div class="block"></div>
+    <div class="block"></div>
+    <div class="block"></div>
+  </div>
+</body>
+</html>

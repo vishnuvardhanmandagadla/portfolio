@@ -1,10 +1,11 @@
 import React from 'react';
-import MainCo from './components/MainCo'; // Import the MainCo component
+import './App.css';
+import MainCo from './components/MainCo';
 
 function App() {
   return (
     <div className="App">
-      <MainCo /> {/* Render MainCo component */}
+      <MainCo />
     </div>
   );
 }

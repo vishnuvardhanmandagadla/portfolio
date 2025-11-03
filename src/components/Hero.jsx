@@ -2,9 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import ReactTypingEffect from "react-typing-effect";
 import { gsap } from "gsap";
 import "./Hero.css";
+import resumePDF from '../assets/Vishnu_Resume.pdf';
 
 const Hero = () => {
   const nameRef = useRef(null);
+  const wordsRef = useRef(null);
   const heroRef = useRef(null);
   const [ripples, setRipples] = useState([]);
   const [shapes, setShapes] = useState([]);
@@ -35,24 +37,46 @@ const Hero = () => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           reverseDisperseEffect();
+          animateWords();
         }
       });
     };
 
+    // Lower threshold for mobile to trigger animation earlier
+    const isMobile = window.innerWidth <= 768;
     const observer = new IntersectionObserver(handleIntersection, {
-      threshold: 0.5,
+      threshold: isMobile ? 0.1 : 0.5,
     });
 
-    const currentRef = nameRef.current;
-    if (currentRef) {
-      observer.observe(currentRef);
+    const currentNameRef = nameRef.current;
+    const currentWordsRef = wordsRef.current;
+    
+    if (currentNameRef) {
+      observer.observe(currentNameRef);
+    }
+    if (currentWordsRef) {
+      observer.observe(currentWordsRef);
+    }
+
+    // Also trigger animation immediately on mobile if already visible
+    if (isMobile && currentWordsRef) {
+      const rect = currentWordsRef.getBoundingClientRect();
+      const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+      if (isVisible) {
+        setTimeout(() => {
+          animateWords();
+        }, 500);
+      }
     }
 
     return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef);
-        observer.disconnect();
+      if (currentNameRef) {
+        observer.unobserve(currentNameRef);
       }
+      if (currentWordsRef) {
+        observer.unobserve(currentWordsRef);
+      }
+      observer.disconnect();
     };
   }, []);
 
@@ -128,6 +152,18 @@ const Hero = () => {
           ease: "power4.out",
         }
       );
+    }
+  };
+
+  const animateWords = () => {
+    const words = wordsRef.current?.querySelectorAll(".word");
+    if (words) {
+      // Apply CSS animation by adding active class
+      words.forEach((word, index) => {
+        setTimeout(() => {
+          word.classList.add('word-active');
+        }, index * 300);
+      });
     }
   };
 
@@ -216,6 +252,23 @@ const Hero = () => {
       setRipples((prev) => prev.filter((r) => r.id !== rippleId));
     }, 1000);
   };
+
+  const scrollToContact = () => {
+    const contactSection = document.getElementById('contact');
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const downloadResume = () => {
+  const link = document.createElement('a');
+  link.href = resumePDF;
+  link.download = 'Vishnu_Vardhan_Resume.pdf';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+  
 
   const renderShape = (shape) => {
     const style = {
@@ -322,26 +375,44 @@ const Hero = () => {
           />
         </div>
 
-        <h1 className="name-animation" ref={nameRef}>
-          <span className="light-text"> I'm </span>
-          <br />
-          <span className="bold-text">
-            {"Vishnu Vardhan".split("").map((letter, index) => (
-              <span key={index} className="letter">
-                {letter}
-              </span>
-            ))}
-          </span>
-        </h1>
+        <div className="name-section">
+          <h1 className="name-animation" ref={nameRef}>
+            <span className="light-text"> I'm </span>
+            <br />
+            <span className="bold-text">
+              {"Vishnu Vardhan".split("").map((letter, index) => (
+                <span key={index} className="letter">
+                  {letter}
+                </span>
+              ))}
+            </span>
+          </h1>
 
-        <div className="highlighted-text">
-          <span className="big-brace">{"{"}</span>
-          <span className="masked-word">Developer</span>
-          <div className="divider"></div>
-          <span className="masked-word">Designer</span>
-          <div className="divider"></div>
-          <span className="masked-word">Dreamer</span>
-          <span className="big-brace">{"}"}</span>
+          <div className="words-container" ref={wordsRef}>
+            <span className="word">Developer</span>
+            <span className="word">Designer</span>
+            <span className="word">Dreamer</span>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="hero-buttons">
+            <button className="btn-talk" onClick={scrollToContact}>
+              <span className="btn-text">Let's Talk</span>
+              <span className="btn-hover-text">Contact Us</span>
+              <div className="arrow-circle">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+            </button>
+            
+            <button className="btn-resume" onClick={downloadResume}>
+              <span>Download Resume</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M21 15V16.2C21 17.8802 21 18.7202 20.673 19.362C20.3854 19.9265 19.9265 20.3854 19.362 20.673C18.7202 21 17.8802 21 16.2 21H7.8C6.11984 21 5.27976 21 4.63803 20.673C4.07354 20.3854 3.6146 19.9265 3.32698 19.362C3 18.7202 3 17.8802 3 16.2V15M17 10L12 15M12 15L7 10M12 15V3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </section>

@@ -10,6 +10,7 @@ const projects = [
   { name: "Student Communication Platform", link: "https://student-communication-vs.web.app/" },
   { name: "Time Table Generator", link: "#" },
   { name: "SETHU Web App", link: "https://sethu-sbp.web.app/" },
+  { name: "Night Wake Studio", link: "https://nightwake-studio.web.app/" },
 ];
 
 const Projects = () => {

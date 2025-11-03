@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
-import { FaGithub, FaLinkedin, FaYoutube, FaEnvelope, FaCode } from 'react-icons/fa';
+import { FaGithub, FaLinkedin, FaYoutube, FaEnvelope, FaCode, FaArrowUp, FaMapMarkerAlt, FaArrowRight } from 'react-icons/fa';
 import { motion, useAnimation, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
+import './Footer.css';
 
 const Footer = () => {
   const [currentYear] = useState(new Date().getFullYear());
   const [hoveredItem, setHoveredItem] = useState(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const controls = useAnimation();
   const [ref, inView] = useInView({
     threshold: 0.1,
@@ -18,35 +20,55 @@ const Footer = () => {
     }
   }, [controls, inView]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const socialLinks = [
     {
       name: 'GitHub',
       url: 'https://github.com/vishnuvardhanmandagadla',
       icon: <FaGithub />,
       color: '#f3dbea',
-      bgColor: '#34091e'
+      bgColor: 'linear-gradient(135deg, #34091e 0%, #430c27 100%)'
     },
     {
       name: 'LinkedIn',
       url: 'https://www.linkedin.com/in/vishnu-vardhan-412962285/',
       icon: <FaLinkedin />,
       color: '#f3dbea',
-      bgColor: '#430c27'
+      bgColor: 'linear-gradient(135deg, #430c27 0%, #55062d 100%)'
     },
     {
       name: 'YouTube',
       url: 'https://www.youtube.com/@Codeandcraftstudios',
       icon: <FaYoutube />,
       color: '#f3dbea',
-      bgColor: '#55062d'
+      bgColor: 'linear-gradient(135deg, #55062d 0%, #660033 100%)'
     },
     {
       name: 'Email',
-      url: 'mailto:vishnuvardhanmandagdala@gamil.com',
+      url: 'mailto:vishnuvardhanmandagdala@gmail.com',
       icon: <FaEnvelope />,
       color: '#f3dbea',
-      bgColor: '#660033'
+      bgColor: 'linear-gradient(135deg, #660033 0%, #802754 100%)'
     }
+  ];
+
+  const quickLinks = [
+    { name: 'Home', url: '#home', icon: <FaArrowRight /> },
+    { name: 'About', url: '#about', icon: <FaArrowRight /> },
+    { name: 'Projects', url: '#projects', icon: <FaArrowRight /> },
+    { name: 'Skills', url: '#skills', icon: <FaArrowRight /> },
+    { name: 'Contact', url: '#contact', icon: <FaArrowRight /> }
   ];
 
   const containerVariants = {
@@ -54,239 +76,300 @@ const Footer = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.3
+        staggerChildren: 0.08,
+        delayChildren: 0.2
       }
     }
   };
 
   const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: { y: 15, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
       transition: {
         type: "spring",
-        damping: 12,
-        stiffness: 100
+        damping: 20,
+        stiffness: 100,
+        duration: 0.5
       }
     }
   };
 
-  const hoverEffect = {
-    y: -5,
-    transition: { type: "spring", stiffness: 500, damping: 15 }
+  const linkVariants = {
+    hidden: { x: -8, opacity: 0 },
+    visible: {
+      x: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 200,
+        damping: 15
+      }
+    },
+    hover: {
+      x: 6,
+      transition: {
+        type: "spring",
+        stiffness: 400,
+        damping: 10
+      }
+    }
   };
 
-  const tapEffect = { scale: 0.95 };
+  const socialHoverEffect = {
+    scale: 1.08,
+    y: -2,
+    transition: { 
+      type: "spring", 
+      stiffness: 400, 
+      damping: 15 
+    }
+  };
+
+  const scrollTopHoverEffect = {
+    scale: 1.1,
+    y: -3,
+    transition: { 
+      type: "spring", 
+      stiffness: 500, 
+      damping: 15 
+    }
+  };
+
+  const tapEffect = { scale: 0.92 };
 
   return (
-    <footer 
-      ref={ref}
-      className="footer"
-      style={{
-        background: 'linear-gradient(135deg, #34091e 0%, #430c27 50%, #55062d 100%)',
-        color: '#f3dbea',
-        padding: '3rem 1rem',
-        position: 'relative',
-        overflow: 'hidden',
-        borderTop: '1px solid rgba(243, 219, 234, 0.1)'
-      }}
-    >
-      {/* Animated background elements */}
+    <footer ref={ref} className="footer">
+      {/* Compact Scroll to Top Button */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0, y: 15 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0, y: 15 }}
+            onClick={scrollToTop}
+            whileHover={scrollTopHoverEffect}
+            whileTap={tapEffect}
+            className="scroll-top-button"
+            aria-label="Scroll to top"
+          >
+            <motion.div
+              animate={{ y: [0, -1, 0] }}
+              transition={{
+                duration: 1.2,
+                repeat: Infinity,
+                repeatType: "reverse",
+                ease: "easeInOut"
+              }}
+            >
+              <FaArrowUp />
+            </motion.div>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Background Elements */}
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.05 }}
-        transition={{ duration: 2 }}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: 'radial-gradient(circle at 50% 50%, #f3dbea 1px, transparent 1px)',
-          backgroundSize: '30px 30px'
-        }}
+        transition={{ duration: 1.5 }}
+        className="footer-background"
       />
       
-      <div style={{ 
-        maxWidth: '1200px',
-        margin: '0 auto',
-        position: 'relative',
-        zIndex: 2
-      }}>
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.03 }}
+        transition={{ duration: 1.5, delay: 0.3 }}
+        className="footer-pattern"
+      />
+      
+      <div className="footer-container">
         <motion.div
           initial="hidden"
           animate={controls}
           variants={containerVariants}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center'
-          }}
         >
-          {/* Logo/Brand */}
-          <motion.div
-            variants={itemVariants}
-            style={{
-              marginBottom: '2rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem'
-            }}
-          >
-            <motion.div
-              whileHover={{ rotate: 15 }}
-              style={{
-                background: '#802754',
-                width: '40px',
-                height: '40px',
-                borderRadius: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#f3dbea'
-              }}
-            >
-              <FaCode size={20} />
+          {/* Compact Main Footer Content */}
+          <div className="footer-grid">
+            {/* Brand Section */}
+            <motion.div variants={itemVariants}>
+              <div className="footer-brand">
+                <motion.div
+                  whileHover={{ 
+                    rotate: 12,
+                    scale: 1.03 
+                  }}
+                  transition={{ 
+                    duration: 0.4,
+                    type: "spring",
+                    stiffness: 300
+                  }}
+                  className="footer-logo"
+                >
+                  <FaCode />
+                </motion.div>
+                <div>
+                  <h3 className="footer-name">
+                    Vishnu Vardhan
+                  </h3>
+                  <p className="footer-tagline">
+                    Full Stack Developer
+                  </p>
+                </div>
+              </div>
+              <p className="footer-description">
+                Crafting digital excellence through innovative solutions and clean code.
+              </p>
+              
+              {/* Contact Info */}
+              <div className="footer-contact">
+                <div className="footer-contact-item">
+                  <FaMapMarkerAlt />
+                  <span>India</span>
+                </div>
+                <div className="footer-contact-item">
+                  <FaEnvelope />
+                  <span>vishnuvardhanmandagdala@gmail.com</span>
+                </div>
+              </div>
             </motion.div>
-            <motion.span 
-              style={{
-                fontSize: '1.2rem',
-                fontWeight: 600,
-                letterSpacing: '1px'
-              }}
+
+            {/* Quick Links */}
+            <motion.div variants={itemVariants}>
+              <h4 className="footer-section-title">
+                Navigation
+              </h4>
+              <ul className="footer-links">
+                {quickLinks.map((link, index) => (
+                  <motion.li 
+                    key={link.name} 
+                    className="footer-link-item"
+                    variants={linkVariants}
+                    initial="hidden"
+                    animate="visible"
+                    whileHover="hover"
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <a
+                      href={link.url}
+                      className="footer-link"
+                    >
+                      <span className="footer-link-arrow">
+                        {link.icon}
+                      </span>
+                      {link.name}
+                    </a>
+                  </motion.li>
+                ))}
+              </ul>
+            </motion.div>
+
+            {/* Connect Section */}
+            <motion.div variants={itemVariants}>
+              <h4 className="footer-section-title">
+                Connect
+              </h4>
+              
+              <ul className="footer-links footer-social-links">
+                {socialLinks.map((link, index) => (
+                  <motion.li 
+                    key={link.name} 
+                    className="footer-link-item"
+                    variants={linkVariants}
+                    initial="hidden"
+                    animate="visible"
+                    whileHover="hover"
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <a
+                      href={link.url}
+                      target={link.name === 'Email' ? '_self' : '_blank'}
+                      rel={link.name === 'Email' ? '' : 'noopener noreferrer'}
+                      className="footer-link"
+                    >
+                      <span className="footer-link-arrow">
+                        {link.icon}
+                      </span>
+                      {link.name}
+                    </a>
+                  </motion.li>
+                ))}
+              </ul>
+            </motion.div>
+          </div>
+
+          {/* Compact Bottom Section */}
+          <motion.div
+            variants={itemVariants}
+            className="footer-bottom"
+          >
+            {/* Divider */}
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: '120px' }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="footer-divider"
+            />
+
+            {/* Copyright */}
+            <div className="footer-copyright">
+              <span>&copy; {currentYear} Vishnu Vardhan</span>
+              <span className="footer-copyright-separator">•</span>
+              <span>All rights reserved</span>
+            </div>
+
+            {/* Additional Links */}
+            <div className="footer-legal-links">
+              <a href="/privacy" className="footer-legal-link">
+                Privacy Policy
+              </a>
+              <a href="/terms" className="footer-legal-link">
+                Terms of Use
+              </a>
+              <a href="/sitemap" className="footer-legal-link">
+                Sitemap
+              </a>
+            </div>
+
+            {/* Motto */}
+            <motion.p
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 0.6, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="footer-motto"
             >
-              Vishnu Vardhan
-            </motion.span>
+              Crafting Digital Excellence
+            </motion.p>
           </motion.div>
-
-          {/* Social Links */}
-          <motion.div
-            variants={itemVariants}
-            style={{
-              display: 'flex',
-              gap: '1.5rem',
-              marginBottom: '2rem'
-            }}
-          >
-            {socialLinks.map((link) => (
-              <motion.a
-                key={link.name}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                variants={itemVariants}
-                whileHover={hoverEffect}
-                whileTap={tapEffect}
-                onMouseEnter={() => setHoveredItem(link.name)}
-                onMouseLeave={() => setHoveredItem(null)}
-                style={{
-                  color: link.color,
-                  fontSize: '1.4rem',
-                  position: 'relative',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-                aria-label={link.name}
-              >
-                <AnimatePresence>
-                  {hoveredItem === link.name && (
-                    <motion.span
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      exit={{ scale: 0, opacity: 0 }}
-                      style={{
-                        position: 'absolute',
-                        background: link.bgColor,
-                        width: '50px',
-                        height: '50px',
-                        borderRadius: '50%',
-                        zIndex: -1
-                      }}
-                    />
-                  )}
-                </AnimatePresence>
-                {link.icon}
-              </motion.a>
-            ))}
-          </motion.div>
-
-          {/* Copyright */}
-          <motion.p
-            variants={itemVariants}
-            style={{
-              fontSize: '0.9rem',
-              marginBottom: '1.5rem',
-              fontWeight: 300,
-              letterSpacing: '0.5px',
-              opacity: 0.8
-            }}
-          >
-            &copy; {currentYear} Vishnu Vardhan. All rights reserved.
-          </motion.p>
-
-          {/* Divider */}
-          <motion.div
-            variants={itemVariants}
-            initial={{ width: 0 }}
-            animate={{ width: '150px' }}
-            transition={{ delay: 0.5, duration: 1 }}
-            style={{
-              height: '1px',
-              background: 'linear-gradient(90deg, transparent, rgba(243, 219, 234, 0.3), transparent)',
-              margin: '1rem 0',
-              width: '150px'
-            }}
-          />
-
-          {/* Tagline */}
-          <motion.p
-            variants={itemVariants}
-            style={{
-              fontSize: '0.85rem',
-              textTransform: 'uppercase',
-              letterSpacing: '2px',
-              opacity: 0.6,
-              marginTop: '1rem'
-            }}
-          >
-            Crafting Digital Excellence
-          </motion.p>
         </motion.div>
       </div>
 
-      {/* Floating particles */}
-      {[...Array(8)].map((_, i) => (
+      {/* Reduced floating particles */}
+      {[...Array(5)].map((_, i) => (
         <motion.div
           key={i}
           initial={{
-            x: Math.random() * 100 - 50,
-            y: Math.random() * 100 - 50,
+            x: Math.random() * 80 - 40,
+            y: Math.random() * 80 - 40,
             opacity: 0
           }}
           animate={{
-            x: [null, Math.random() * 100 - 50],
-            y: [null, Math.random() * 100 - 50],
-            opacity: [0, 0.4, 0],
-            scale: [0.8, 1.2, 0.8]
+            x: [null, Math.random() * 80 - 40],
+            y: [null, Math.random() * 80 - 40],
+            opacity: [0, 0.3, 0],
+            scale: [0.7, 1, 0.7]
           }}
           transition={{
-            duration: Math.random() * 15 + 15,
+            duration: Math.random() * 12 + 10,
             repeat: Infinity,
             repeatType: 'reverse',
-            ease: 'linear'
+            ease: "easeInOut"
           }}
+          className="floating-particle"
           style={{
-            position: 'absolute',
-            width: '6px',
-            height: '6px',
-            borderRadius: '50%',
-            background: '#f3dbea',
-            top: `${Math.random() * 80 + 10}%`,
-            left: `${Math.random() * 80 + 10}%`,
-            filter: 'blur(0.5px)'
+            top: `${Math.random() * 70 + 15}%`,
+            left: `${Math.random() * 70 + 15}%`,
           }}
         />
       ))}

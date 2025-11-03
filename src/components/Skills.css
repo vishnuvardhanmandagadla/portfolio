@@ -78,3 +78,109 @@
 .skills-heading.watermark {
   animation: watermarkEffect 3s forwards; /* Apply watermark effect */
 }
+
+/* Mobile Responsive Styles - Premium Design */
+@media (max-width: 768px) {
+  .skills {
+    padding: 4rem 1.5rem 3rem;
+    height: auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .skills-heading {
+    font-size: 4.5rem;
+    margin-bottom: 3rem;
+    gap: 3px;
+    opacity: 0.15;
+  }
+
+  .skills-list {
+    margin-top: -180px;
+    gap: 18px;
+    transform: scale(1);
+    padding: 0 1rem;
+    justify-content: center;
+  }
+
+  .skill-item {
+    margin: 0;
+    padding: 20px 16px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    border: 1px solid rgba(66, 0, 50, 0.1);
+    box-shadow: 
+      0 4px 16px rgba(66, 0, 50, 0.1),
+      0 2px 8px rgba(66, 0, 50, 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 100px;
+    flex: 0 1 calc(33.333% - 12px);
+  }
+
+  .skill-item:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 
+      0 8px 24px rgba(66, 0, 50, 0.15),
+      0 4px 12px rgba(66, 0, 50, 0.1);
+    background: rgba(255, 255, 255, 0.85);
+  }
+
+  .skill-icon {
+    font-size: 2.75rem;
+    margin-bottom: 10px;
+    filter: drop-shadow(0 2px 4px rgba(66, 0, 50, 0.2));
+  }
+
+  .skill-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #430c27;
+    letter-spacing: 0.3px;
+  }
+}
+
+@media (max-width: 480px) {
+  .skills {
+    padding: 3.5rem 1rem 2.5rem;
+    min-height: 100vh;
+  }
+
+  .skills-heading {
+    font-size: 3.25rem;
+    margin-bottom: 2.5rem;
+    gap: 2px;
+    opacity: 0.12;
+  }
+
+  .skills-list {
+    margin-top: -140px;
+    gap: 14px;
+    transform: scale(1);
+    padding: 0 0.5rem;
+  }
+
+  .skill-item {
+    padding: 18px 14px;
+    border-radius: 14px;
+    min-width: 90px;
+    flex: 0 1 calc(50% - 7px);
+    max-width: calc(50% - 7px);
+  }
+
+  .skill-item:hover {
+    transform: translateY(-3px) scale(1.03);
+  }
+
+  .skill-icon {
+    font-size: 2.25rem;
+    margin-bottom: 8px;
+  }
+
+  .skill-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+}
