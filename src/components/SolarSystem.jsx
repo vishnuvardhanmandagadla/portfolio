@@ -49,48 +49,40 @@ const SolarSystem = () => {
     };
   }, []);
 
-  // Handle expand button click - cinematic fullscreen expansion
+  // Handle expand button click - direct fullscreen without animation jerk
   const handleExpand = async () => {
     const container = document.querySelector('.solar-system-container');
-    const intro = document.querySelector('.solar-system-intro');
 
-    if (container && intro) {
-      // Get current position and dimensions of the banner
-      const rect = intro.getBoundingClientRect();
-
-      // Set CSS custom properties for the animation starting point
-      container.style.setProperty('--start-top', `${rect.top}px`);
-      container.style.setProperty('--start-left', `${rect.left}px`);
-      container.style.setProperty('--start-width', `${rect.width}px`);
-      container.style.setProperty('--start-height', `${rect.height}px`);
-    }
-
-    setIsAnimating(true);
-
-    // Wait for the cinematic expansion animation to complete
-    setTimeout(async () => {
-      // Request fullscreen on the container
-      if (container) {
-        try {
-          if (container.requestFullscreen) {
-            await container.requestFullscreen();
-          } else if (container.webkitRequestFullscreen) {
-            await container.webkitRequestFullscreen();
-          } else if (container.msRequestFullscreen) {
-            await container.msRequestFullscreen();
-          }
-        } catch (err) {
-          console.log('Fullscreen request failed:', err);
+    if (container) {
+      try {
+        // Request fullscreen immediately
+        if (container.requestFullscreen) {
+          await container.requestFullscreen();
+        } else if (container.webkitRequestFullscreen) {
+          await container.webkitRequestFullscreen();
+        } else if (container.msRequestFullscreen) {
+          await container.msRequestFullscreen();
         }
-      }
 
-      // Start the 3D scene after fullscreen
-      setTimeout(() => {
-        setIsExpanded(true);
-        // Reset clock when starting
-        clockRef.current = new THREE.Clock();
-      }, 100);
-    }, 1500); // Wait for expansion animation (1.5s)
+        // After fullscreen is active, start the animation and 3D scene
+        setIsAnimating(true);
+
+        // Small delay to let fullscreen settle, then show 3D scene
+        setTimeout(() => {
+          setIsExpanded(true);
+          // Reset clock when starting
+          clockRef.current = new THREE.Clock();
+        }, 300);
+      } catch (err) {
+        console.log('Fullscreen request failed:', err);
+        // Fallback: still show the experience even if fullscreen fails
+        setIsAnimating(true);
+        setTimeout(() => {
+          setIsExpanded(true);
+          clockRef.current = new THREE.Clock();
+        }, 300);
+      }
+    }
   };
 
   // Handle exit fullscreen

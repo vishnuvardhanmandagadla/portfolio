@@ -157,20 +157,15 @@ const Navbar = () => {
     const element = resolveElementBySection(section);
     if (element) {
       if (scroll) {
-        // Get the element's position
-        const elementTop = element.getBoundingClientRect().top;
-        const scrollY = scroll.scroll?.instance?.scroll?.y || 0;
-        const targetY = scrollY + elementTop;
-
-        // Use scrollTo with immediate flag to avoid lerp interference
-        scroll.scrollTo(targetY, {
-          duration: 0,
-          disableLerp: true,
-          immediate: true,
+        // Smooth scroll to element with animation
+        scroll.scrollTo(element, {
+          offset: 0,
+          duration: 1200,
+          easing: [0.25, 0.0, 0.35, 1.0],
         });
       } else {
         element.scrollIntoView({
-          behavior: 'auto',
+          behavior: 'smooth',
           block: 'start'
         });
       }

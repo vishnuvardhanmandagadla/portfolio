@@ -326,7 +326,11 @@ PortfolioSections.displayName = 'PortfolioSections';
 // Main Portfolio Content Component - Wraps sections with Locomotive Scroll
 const MainCo = ({ isLoaderDone }) => {
   const containerRef = useRef(null);
-  const [enableSmoothScroll, setEnableSmoothScroll] = useState(true);
+  // Default to true on desktop, will be updated in useEffect
+  const [enableSmoothScroll, setEnableSmoothScroll] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return window.innerWidth > 768;
+  });
   const [scrollTarget, setScrollTarget] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
@@ -334,26 +338,25 @@ const MainCo = ({ isLoaderDone }) => {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const isMobile = window.innerWidth <= 768;
-    
-    const updateSmoothPreference = () => {
-      setEnableSmoothScroll(!mediaQuery.matches && !isMobile);
+
+    const checkAndSetSmooth = () => {
+      const isMobile = window.innerWidth <= 768;
+      const shouldEnable = !mediaQuery.matches && !isMobile;
+      setEnableSmoothScroll(shouldEnable);
     };
 
-    updateSmoothPreference();
-    mediaQuery.addEventListener('change', updateSmoothPreference);
-    
-    const handleResize = () => {
-      const nowMobile = window.innerWidth <= 768;
-      if (nowMobile !== isMobile) {
-        setEnableSmoothScroll(!mediaQuery.matches && !nowMobile);
-      }
-    };
-    window.addEventListener('resize', handleResize, { passive: true });
+    // Initial check
+    checkAndSetSmooth();
+
+    // Listen for motion preference changes
+    mediaQuery.addEventListener('change', checkAndSetSmooth);
+
+    // Listen for resize
+    window.addEventListener('resize', checkAndSetSmooth, { passive: true });
 
     return () => {
-      mediaQuery.removeEventListener('change', updateSmoothPreference);
-      window.removeEventListener('resize', handleResize);
+      mediaQuery.removeEventListener('change', checkAndSetSmooth);
+      window.removeEventListener('resize', checkAndSetSmooth);
     };
   }, []);
 
