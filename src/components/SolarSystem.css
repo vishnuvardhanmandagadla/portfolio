@@ -16,6 +16,7 @@
   padding: 0;
   margin: 0;
   background: transparent;
+  overflow: visible; /* Allow meteoroids to overflow */
 }
 
 .solar-system-container.collapsed .solar-system-intro {
@@ -66,7 +67,7 @@
 .solar-system-intro {
   position: relative;
   width: 100%;
-  overflow: hidden;
+  overflow: visible; /* Allow meteoroids to overflow into other sections */
   z-index: 5;
   display: flex;
   align-items: center;
@@ -274,6 +275,21 @@
 
 .explore-btn:hover .btn-icon {
   transform: translateX(4px);
+}
+
+/* ============================================
+   3D METEOROIDS CANVAS (Three.js)
+   Real 3D floating space rocks
+   ============================================ */
+
+.meteoroids-3d-canvas {
+  position: absolute;
+  top: -50%;
+  left: -10%;
+  width: 120%;
+  height: 200%;
+  pointer-events: none;
+  z-index: 10;
 }
 
 /* Hide particles for cleaner look */
@@ -738,6 +754,10 @@
   .explore-btn {
     transition: none;
     animation: none;
+  }
+
+  .meteoroids-3d-canvas {
+    display: none;
   }
 
   .solar-system-title {
