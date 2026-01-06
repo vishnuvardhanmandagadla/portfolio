@@ -16,10 +16,6 @@ const SolarSystem = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Local fog transition state (for fullscreen support)
-  const [showLocalFog, setShowLocalFog] = useState(false);
-  const [localFogPhase, setLocalFogPhase] = useState('');
-
   // Cinematic intro state
   const [introComplete, setIntroComplete] = useState(false);
   const [showTitle, setShowTitle] = useState(false);
@@ -55,62 +51,45 @@ const SolarSystem = () => {
     };
   }, []);
 
-  // Handle expand button click - with local fog transition then fullscreen
-  const handleExpand = async () => {
-    const container = document.querySelector('.solar-system-container');
-
-    // Start local fog transition
-    setShowLocalFog(true);
-    setLocalFogPhase('enter');
-
-    // Fog fully covers screen
-    setTimeout(async () => {
-      setLocalFogPhase('full');
-
-      // Request fullscreen and start experience
-      if (container) {
-        try {
-          if (container.requestFullscreen) {
-            await container.requestFullscreen();
-          } else if (container.webkitRequestFullscreen) {
-            await container.webkitRequestFullscreen();
-          } else if (container.msRequestFullscreen) {
-            await container.msRequestFullscreen();
-          }
-        } catch (err) {
-          console.log('Fullscreen request failed:', err);
-        }
-      }
-
-      // Start animation and 3D scene
+  // Handle expand button click - use global fog transition
+  const handleExpand = () => {
+    const launchExperience = () => {
+      // Use CSS fullscreen mode (fixed positioning)
+      setIsFullscreen(true);
       setIsAnimating(true);
 
+      // Small delay to let CSS transition settle, then show 3D scene
       setTimeout(() => {
         setIsExpanded(true);
+        // Reset clock when starting
         clockRef.current = new THREE.Clock();
+      }, 300);
+    };
 
-        // Start exit animation
-        setTimeout(() => {
-          setLocalFogPhase('exit');
-
-          // Remove fog after exit animation
-          setTimeout(() => {
-            setShowLocalFog(false);
-            setLocalFogPhase('');
-          }, 800);
-        }, 300);
-      }, 200);
-    }, 600);
+    // Use global fog transition
+    if (transition?.triggerTransition) {
+      transition.triggerTransition(launchExperience);
+    } else {
+      launchExperience();
+    }
   };
 
-  // Handle exit fullscreen
+  // Handle exit fullscreen - use global fog transition
   const handleExitFullscreen = () => {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen();
-    } else if (document.msExitFullscreen) {
-      document.msExitFullscreen();
+    const exitExperience = () => {
+      setIsFullscreen(false);
+      setIsExpanded(false);
+      setIsAnimating(false);
+      setIntroComplete(false);
+      setShowTitle(false);
+      skipIntroRef.current = false;
+    };
+
+    // Use global fog transition for exit too
+    if (transition?.triggerTransition) {
+      transition.triggerTransition(exitExperience);
+    } else {
+      exitExperience();
     }
   };
 
@@ -1148,17 +1127,7 @@ const SolarSystem = () => {
   }, [themeColors, isExpanded]);
 
   return (
-    <div className={`solar-system-container ${isAnimating ? 'expanding' : ''} ${isExpanded ? 'expanded' : 'collapsed'}`}>
-      {/* Local Fog Curtain for fullscreen transition */}
-      {showLocalFog && (
-        <div className={`solar-fog-curtain ${localFogPhase}`}>
-          <div className="solar-fog-solid" />
-          <div className="solar-fog-layer solar-fog-layer-1" />
-          <div className="solar-fog-layer solar-fog-layer-2" />
-          <div className="solar-fog-layer solar-fog-layer-3" />
-        </div>
-      )}
-
+    <div className={`solar-system-container ${isAnimating ? 'expanding' : ''} ${isExpanded ? 'expanded' : 'collapsed'} ${isFullscreen ? 'css-fullscreen' : ''}`}>
       {/* Initial collapsed state - Explore button */}
       {!isExpanded && (
         <div className="solar-system-intro">
