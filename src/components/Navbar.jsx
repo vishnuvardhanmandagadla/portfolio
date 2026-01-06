@@ -157,13 +157,22 @@ const Navbar = () => {
     const element = resolveElementBySection(section);
     if (element) {
       if (scroll) {
-        // Smooth scroll with lerp disabled for consistent animation
-        scroll.scrollTo(element, {
-          offset: 0,
-          duration: 1500,
-          easing: [0.45, 0, 0.55, 1],
-          disableLerp: true,
-        });
+        // Update scroll limits before navigating
+        scroll.update();
+
+        setTimeout(() => {
+          scroll.scrollTo(element, {
+            offset: 0,
+            duration: 1200,
+            easing: [0.25, 0.0, 0.35, 1.0],
+            callback: () => {
+              // Update scroll limits after navigation completes
+              setTimeout(() => {
+                scroll.update();
+              }, 100);
+            }
+          });
+        }, 50);
       } else {
         element.scrollIntoView({
           behavior: 'smooth',
