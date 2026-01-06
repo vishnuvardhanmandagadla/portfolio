@@ -1,10 +1,14 @@
-import React, { useEffect, useRef, useState, useCallback, memo, useMemo } from "react";
+import React, { useEffect, useRef, useState, useCallback, memo, useMemo, createContext, useContext } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { LocomotiveScrollProvider, useLocomotiveScroll } from 'react-locomotive-scroll';
 import Navbar from './Navbar';
 import Hero from './Hero';
 import WhatIDo from './WhatIDo';
+
+// Page Transition Context - allows triggering transition from anywhere
+const PageTransitionContext = createContext(null);
+export const usePageTransition = () => useContext(PageTransitionContext);
 // Lazy load heavy components for better initial load performance
 const BioSection = React.lazy(() => import('./BioSection'));
 const Skills = React.lazy(() => import('./Skills'));
@@ -323,6 +327,19 @@ const PortfolioSections = memo(({ containerRef, scrollTarget, isLoaderDone }) =>
 
 PortfolioSections.displayName = 'PortfolioSections';
 
+// Fog Curtain Transition Component
+const FogCurtain = ({ isActive, phase }) => {
+  if (!isActive) return null;
+
+  return (
+    <div className={`fog-curtain ${phase}`}>
+      <div className="fog-layer fog-layer-1" />
+      <div className="fog-layer fog-layer-2" />
+      <div className="fog-layer fog-layer-3" />
+    </div>
+  );
+};
+
 // Main Portfolio Content Component - Wraps sections with Locomotive Scroll
 const MainCo = ({ isLoaderDone }) => {
   const containerRef = useRef(null);
@@ -334,6 +351,33 @@ const MainCo = ({ isLoaderDone }) => {
   const [scrollTarget, setScrollTarget] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Fog curtain transition state
+  const [showFog, setShowFog] = useState(false);
+  const [fogPhase, setFogPhase] = useState('');
+
+  // Trigger page transition with callback
+  const triggerTransition = useCallback((onMiddle) => {
+    setShowFog(true);
+    setFogPhase('enter');
+
+    // When fog fully covers screen, execute callback
+    setTimeout(() => {
+      setFogPhase('full');
+      if (onMiddle) onMiddle();
+
+      // Start fog exit
+      setTimeout(() => {
+        setFogPhase('exit');
+
+        // Remove fog after animation
+        setTimeout(() => {
+          setShowFog(false);
+          setFogPhase('');
+        }, 1000);
+      }, 300);
+    }, 800);
+  }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -368,45 +412,50 @@ const MainCo = ({ isLoaderDone }) => {
   }, [location, navigate]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-    >
-      <LocomotiveScrollProvider
-        options={{
-          smooth: enableSmoothScroll,
-          lerp: enableSmoothScroll ? 0.05 : 1,
-          multiplier: 0.5,
-          class: 'is-inview',
-          getDirection: true,
-          resetNativeScroll: true,
-          firefoxMultiplier: 25,
-          touchMultiplier: 2.5,
-          scrollFromAnywhere: false,
-          reloadOnContextChange: false,
-          smartphone: {
-            smooth: false,
-            lerp: 1,
-            multiplier: 1,
-          },
-          tablet: {
-            smooth: false,
-            lerp: 1,
-            multiplier: 1,
-          },
-        }}
-        watch={[enableSmoothScroll]}
-        containerRef={containerRef}
+    <PageTransitionContext.Provider value={{ triggerTransition }}>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       >
-        <PortfolioSections 
-          containerRef={containerRef} 
-          scrollTarget={scrollTarget} 
-          isLoaderDone={isLoaderDone} 
-        />
-      </LocomotiveScrollProvider>
-    </motion.div>
+        <LocomotiveScrollProvider
+          options={{
+            smooth: enableSmoothScroll,
+            lerp: enableSmoothScroll ? 0.05 : 1,
+            multiplier: 0.5,
+            class: 'is-inview',
+            getDirection: true,
+            resetNativeScroll: true,
+            firefoxMultiplier: 25,
+            touchMultiplier: 2.5,
+            scrollFromAnywhere: false,
+            reloadOnContextChange: false,
+            smartphone: {
+              smooth: false,
+              lerp: 1,
+              multiplier: 1,
+            },
+            tablet: {
+              smooth: false,
+              lerp: 1,
+              multiplier: 1,
+            },
+          }}
+          watch={[enableSmoothScroll]}
+          containerRef={containerRef}
+        >
+          <PortfolioSections
+            containerRef={containerRef}
+            scrollTarget={scrollTarget}
+            isLoaderDone={isLoaderDone}
+          />
+        </LocomotiveScrollProvider>
+
+        {/* Fog Curtain Transition - Full screen */}
+        <FogCurtain isActive={showFog} phase={fogPhase} />
+      </motion.div>
+    </PageTransitionContext.Provider>
   );
 };
 
