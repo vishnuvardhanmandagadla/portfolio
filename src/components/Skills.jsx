@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { motion, useAnimation } from "framer-motion";
-import { FaPython, FaReact, FaHtml5, FaCss3Alt, FaJava } from "react-icons/fa";
-import { SiDjango, SiC, SiJavascript, SiFirebase, SiTailwindcss } from "react-icons/si";
+import { FaPython, FaReact, FaHtml5, FaJava } from "react-icons/fa";
+import { SiDjango, SiBlender, SiJavascript, SiFirebase, SiTailwindcss, SiN8N } from "react-icons/si";
 import "./Skills.css"; // Import the CSS file
 
 const Skills = () => {
@@ -58,18 +58,19 @@ const Skills = () => {
     { name: "React", icon: <FaReact style={{ color: "#420032" }} /> },
     { name: "Django", icon: <SiDjango style={{ color: "#420032" }} /> },
     { name: "HTML", icon: <FaHtml5 style={{ color: "#420032" }} /> },
-    { name: "CSS", icon: <FaCss3Alt style={{ color: "#420032" }} /> },
     { name: "JavaScript", icon: <SiJavascript style={{ color: "#420032" }} /> },
     { name: "Firebase", icon: <SiFirebase style={{ color: "#420032" }} /> },
     { name: "Tailwind CSS", icon: <SiTailwindcss style={{ color: "#420032" }} /> },
-    { name: "C", icon: <SiC style={{ color: "#420032" }} /> },
+    { name: "n8n", icon: <SiN8N style={{ color: "#420032" }} /> },
+    { name: "Blender", icon: <SiBlender style={{ color: "#420032" }} /> },
     { name: "Java (Basic)", icon: <FaJava style={{ color: "#420032" }} /> },
   ];
   
 
   return (
     <section id="skills" className="skills" ref={sectionRef}>
-      <motion.div
+      <motion.h2
+        id="skills-heading"
         className="skills-heading"
         initial="hidden"
         animate={controls}
@@ -84,7 +85,7 @@ const Skills = () => {
             {letter}
           </motion.span>
         ))}
-      </motion.div>
+      </motion.h2>
       <motion.ul
         className="skills-list"
         initial="hidden"

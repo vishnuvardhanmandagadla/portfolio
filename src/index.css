@@ -1,3 +1,5 @@
+@import "locomotive-scroll/dist/locomotive-scroll.css";
+
 /* Mobile-first base styles */
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -37,6 +39,14 @@ html {
   max-width: 100vw;
   overflow-x: hidden;
   box-sizing: border-box;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+html::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 body {
@@ -46,10 +56,14 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  overflow-x: hidden !important;
-  overflow-y: auto;
+  overflow: hidden;
   line-height: 1.6;
   position: relative;
+}
+
+/* Ensure body stays hidden when locomotive scroll is active */
+html.has-scroll-smooth body {
+  overflow: hidden;
 }
 
 /* Root container */
@@ -61,6 +75,74 @@ body {
   flex-direction: column;
   position: relative;
   overflow-x: hidden;
+}
+
+/* Locomotive Scroll specific styles */
+html.has-scroll-smooth {
+  overflow: hidden;
+}
+
+html.has-scroll-dragging {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+[data-scroll-container] {
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+[data-scroll-section] {
+  position: relative;
+  will-change: transform;
+  contain: layout style;
+}
+
+/* Smooth scroll performance optimizations */
+.c-scrollbar {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 11px;
+  height: 100%;
+  transform-origin: center right;
+  transition: transform 0.3s, opacity 0.3s;
+  opacity: 0;
+}
+
+.c-scrollbar:hover {
+  transform: scaleX(1.45);
+}
+
+.c-scrollbar:hover,
+.has-scroll-scrolling .c-scrollbar,
+.has-scroll-dragging .c-scrollbar {
+  opacity: 1;
+}
+
+.c-scrollbar_thumb {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0.5;
+  width: 7px;
+  border-radius: 10px;
+  margin: 2px;
+  cursor: -webkit-grab;
+  cursor: grab;
+}
+
+.has-scroll-dragging .c-scrollbar_thumb {
+  cursor: -webkit-grabbing;
+  cursor: grabbing;
 }
 
 /* Typography scale */

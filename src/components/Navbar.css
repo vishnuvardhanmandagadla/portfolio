@@ -134,6 +134,7 @@
   background: transparent;
   opacity: 0;
   transform: translateY(5px);
+  text-transform: uppercase;
 }
 
 .navbar.show .nav-links li a {
@@ -407,6 +408,7 @@
     will-change: transform, background-color;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
+    text-transform: uppercase;
   }
 
   .navbar-container .nav-links li a:hover {

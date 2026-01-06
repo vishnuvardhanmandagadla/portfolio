@@ -125,9 +125,42 @@ const ContactCircle = () => {
 
   return (
     <div className="contact-container">
+      {/* Paper Airplane with Infinity Trail Background */}
+      <svg className="paper-plane-trail" viewBox="0 0 600 300" preserveAspectRatio="xMidYMid meet">
+        <g transform="translate(0,300) scale(0.1,-0.1)" fill="#55062d" stroke="none">
+          <path d="M5799 2402 c-56 -43 -299 -180 -299 -168 0 7 12 18 27 25 26 12 234
+            130 242 137 17 15 -31 8 -214 -31 -194 -41 -225 -50 -214 -58 13 -11 103 -57
+            110 -57 23 0 5 23 -28 37 -21 9 -33 17 -28 19 31 11 279 63 282 60 3 -2 -33
+            -23 -78 -46 -113 -57 -118 -61 -121 -89 -2 -20 -34 -42 -179 -126 -290 -169
+            -567 -318 -874 -470 -524 -260 -764 -348 -1110 -407 -181 -30 -421 -31 -553 0
+            -132 30 -135 33 -69 70 82 46 178 141 217 213 64 121 51 252 -35 347 -161 179
+            -474 106 -541 -127 -46 -158 28 -327 189 -432 l57 -37 -32 -12 c-218 -80 -392
+            -124 -833 -214 -436 -88 -573 -119 -757 -171 -293 -83 -506 -173 -676 -284
+            -98 -65 -201 -155 -189 -167 4 -4 24 8 45 28 91 87 239 180 402 253 244 108
+            542 190 1126 309 537 109 661 140 851 212 l91 35 59 -20 c117 -39 174 -46 358
+            -45 422 1 776 110 1438 440 291 146 863 460 1005 552 21 14 22 13 22 -22 0
+            -46 16 -46 37 -1 9 19 21 35 25 35 5 0 31 -11 58 -25 27 -14 52 -25 55 -25 8
+            0 175 257 175 269 0 16 -14 13 -41 -7z m-15 -55 c-11 -12 -44 -59 -73 -103
+            l-52 -82 -54 30 c-30 16 -55 31 -55 33 0 1 39 25 88 53 48 28 103 62 122 75
+            41 29 52 26 24 -6z m-256 -152 c-12 -27 -28 -33 -28 -10 0 11 23 33 37 35 2 0
+            -3 -11 -9 -25z m-2751 -291 c144 -70 192 -234 112 -384 -40 -75 -136 -166
+            -223 -211 l-63 -33 -49 29 c-247 145 -286 454 -74 582 97 59 199 65 297 17z"/>
+          <path d="M2521 1387 c-8 -10 -7 -14 2 -14 8 0 14 6 14 14 0 7 -1 13 -2 13 -2
+            0 -8 -6 -14 -13z"/>
+          <path d="M4725 1841 c-3 -5 -2 -12 3 -15 5 -3 9 1 9 9 0 17 -3 19 -12 6z"/>
+          <path d="M4456 1572 c-3 -5 1 -9 9 -9 8 0 12 4 9 9 -3 4 -7 8 -9 8 -2 0 -6 -4
+            -9 -8z"/>
+          <path d="M5810 175 c-20 -24 -1 -49 43 -56 24 -4 34 -2 30 5 -4 6 -7 22 -7 36
+            -1 19 -7 26 -27 28 -15 2 -31 -4 -39 -13z m58 -18 c4 -20 -25 -34 -40 -19 -15
+            15 -1 44 19 40 10 -2 19 -11 21 -21z"/>
+          <path d="M5836 161 c-4 -5 -2 -12 3 -15 5 -4 12 -2 15 3 4 5 2 12 -3 15 -5 4
+            -12 2 -15 -3z"/>
+        </g>
+      </svg>
+
       {/* Static Contact Us Heading */}
       <div className="contact-heading">
-        <h1>CONTACT US</h1>
+        <h2 id="contact-heading">Contact Us</h2>
       </div>
 
       {/* Contact Circle */}
@@ -146,7 +179,7 @@ const ContactCircle = () => {
           >
             <div className="circle-content">
               <FiMail className="mail-icon" />
-              <span className="circle-text">Get in Touch</span>
+              <span className="circle-text">GET IN TOUCH</span>
             </div>
           </div>
         </div>
@@ -155,7 +188,12 @@ const ContactCircle = () => {
       {/* Contact Form Overlay */}
       <div className={`contact-form-overlay ${isExpanded ? 'show' : ''}`}>
         <div className="contact-form">
-          <button className="close-btn" onClick={handleClose}>
+          <button
+            type="button"
+            className="close-btn"
+            onClick={handleClose}
+            aria-label="Close contact form"
+          >
             <FiX />
           </button>
           

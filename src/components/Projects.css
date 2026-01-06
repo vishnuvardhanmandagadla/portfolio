@@ -10,32 +10,34 @@
   overflow-x: hidden;
   overflow-y: visible;
   box-sizing: border-box;
+  contain: layout style;
 }
 
 .watermark-text {
   position: absolute;
   top: 25%;
   left: 0;
+  right: 0;
   transform: translateY(-50%);
-  padding-left: 1rem; /* Adjust based on actual left spacing */
   font-size: 18rem;
   font-weight: 700;
   color: #fbb6e4;
   z-index: 0;
   opacity: 0.2;
   text-transform: uppercase;
-  white-space: nowrap;
   user-select: none;
   pointer-events: none;
   line-height: 1;
+  text-align: center;
+  width: 100%;
 }
-
 
 .grid {
   display: grid;
 }
 
-.text-4xl {
+.text-4xl,
+.project-trigger {
   font-size: 2.25rem;
 }
 
@@ -51,6 +53,11 @@
   font-size: 8rem;
 }
 
+/* Additional size classes for increased visibility */
+.text-5xl {
+  font-size: 3rem;
+}
+
 .font-black {
   font-weight: bold;
 }
@@ -61,6 +68,15 @@
 
 .relative {
   position: relative;
+}
+
+.project-trigger {
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
 }
 
 /* Key fix for hiding overflow properly */
@@ -93,145 +109,210 @@
   color: #fbcfe8;
 }
 
-/* Link icon styles */
-.link-icon-container {
+/* Arrow in circle styles - FIXED CENTER ALIGNMENT */
+.arrow-container {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.5em;
-  height: 1.5em;
+  vertical-align: top;
+  margin-left: 0.5em;
+  height: 1em; /* Match text height */
+}
+
+.circle-bg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
   border-radius: 50%;
   background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(249, 168, 212, 0.3);
   transition: all 0.3s ease;
+  position: relative;
 }
 
-.link-icon {
+.arrow-icon {
   color: #f9a8d4;
-  font-size: 0.8em;
+  font-size: 0.28em; /* Smaller arrow */
+  font-weight: 300; /* Lighter weight */
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Perfect center */
 }
 
-.group:hover .link-icon {
-  font-weight: bold;
-  transform: scale(1.2);
+/* Hover effects for arrow */
+.group:hover .arrow-icon {
+  transform: translate(-50%, -50%) rotate(-45deg); /* Center + rotate */
+}
+
+.group:hover .circle-bg {
+  background-color: #f9a8d4; /* Fill on hover */
+  transform: scale(1.1);
+  border-color: #f9a8d4;
+}
+
+.group:hover .arrow-icon {
+  color: #660033; /* Dark color when circle is filled */
 }
 
 .group:hover .first-layer span {
   color: #f9a8d4;
 }
 
+/* Hide arrow in second layer to avoid double arrows */
+.absolute .arrow-container {
+  display: none !important;
+}
+
 /* Ensure proper spacing and height for all characters */
 .first-layer, .absolute {
   letter-spacing: 1px;
   height: 1em;
+  display: flex;
+  align-items: center;
 }
 
 .first-layer span, .absolute span {
   height: 100%;
   vertical-align: top;
+  line-height: 1;
 }
 
-/* Mobile Responsive Styles - Premium Design */
+/* ============================================
+   MINIMALIST MOBILE PROJECTS - Minh Pham Style
+   Clean list, simple typography
+   ============================================ */
 @media (max-width: 768px) {
   .project-container {
     min-height: 100vh;
-    padding: 4rem 1.5rem 3rem;
+    padding: 80px 32px 60px;
+    background: linear-gradient(135deg, #330026, #660033);
   }
 
   .watermark-text {
-    font-size: 4.5rem;
-    top: 18%;
-    padding-left: 0.5rem;
-    letter-spacing: 3px;
-    opacity: 0.15;
+    font-size: clamp(3rem, 10vw, 4.5rem);
+    top: 12%;
+    padding-left: 0;
+    letter-spacing: 1px;
+    opacity: 0.08;
   }
 
   .grid {
-    gap: 2rem;
-    padding: 2rem 1rem;
+    gap: 32px;
+    padding: 0;
     max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  /* Override Tailwind classes for mobile - use higher specificity */
+  /* Clean minimalist project items */
+  .project-container .project-trigger,
   .project-container .text-4xl,
+  .project-container .text-5xl,
   .project-container .sm\:text-6xl,
+  .project-container .sm\:text-7xl,
   .project-container .md\:text-7xl,
-  .project-container .lg\:text-8xl {
-    font-size: 1.85rem !important;
-    font-weight: 700 !important;
-    line-height: 1.3 !important;
-    padding: 12px 20px !important;
-    border-radius: 12px !important;
-    background: rgba(221, 181, 204, 0.05) !important;
-    backdrop-filter: blur(10px) !important;
-    border: 1px solid rgba(221, 181, 204, 0.15) !important;
-    transition: all 0.3s ease !important;
-    display: inline-block !important;
-    margin: 4px 0 !important;
+  .project-container .md\:text-8xl,
+  .project-container .lg\:text-8xl,
+  .project-container .lg\:text-9xl {
+    font-size: clamp(1.5rem, 5vw, 2rem) !important;
+    font-weight: 400 !important;
+    line-height: 1.5 !important;
+    padding: 24px 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(249, 168, 212, 0.2) !important;
+    transition: color 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin: 0 !important;
+    width: 100% !important;
+    color: #fbcfe8 !important;
+    text-align: left;
   }
 
-  .project-container a:hover .text-4xl,
-  .project-container a:hover .sm\:text-6xl,
-  .project-container a:hover .md\:text-7xl,
-  .project-container a:hover .lg\:text-8xl {
-    background: rgba(221, 181, 204, 0.12) !important;
-    transform: translateX(4px) !important;
-    box-shadow: 0 4px 16px rgba(221, 181, 204, 0.2) !important;
+  .project-container .project-trigger:active {
+    color: #ffffff !important;
+    background: transparent !important;
+    transform: none !important;
   }
 
-  .link-icon-container {
-    width: 1.3em !important;
-    height: 1.3em !important;
-    margin-left: 0.6rem !important;
-    background-color: rgba(249, 168, 212, 0.2) !important;
+  .arrow-container {
+    margin-left: 16px !important;
+    height: auto;
+    flex-shrink: 0;
+  }
+
+  .circle-bg {
+    width: 24px !important;
+    height: 24px !important;
+    background: transparent !important;
+    border: 1px solid rgba(249, 168, 212, 0.4) !important;
     border-radius: 50% !important;
-    padding: 2px !important;
   }
 
-  .link-icon {
-    font-size: 0.75em !important;
+  .arrow-icon {
+    font-size: 10px !important;
+    color: #fbcfe8 !important;
+    font-weight: 300 !important;
+  }
+  
+  .project-container .project-trigger:active .circle-bg {
+    background: rgba(249, 168, 212, 0.2) !important;
   }
 }
 
 @media (max-width: 480px) {
   .project-container {
-    padding: 3.5rem 1rem 2.5rem;
-    min-height: 100vh;
+    padding: 60px 24px 48px;
   }
 
   .watermark-text {
-    font-size: 3.25rem;
-    top: 15%;
-    padding-left: 0.25rem;
-    letter-spacing: 2px;
-    opacity: 0.12;
+    font-size: clamp(2.5rem, 8vw, 3.5rem);
+    top: 10%;
+    opacity: 0.06;
   }
 
   .grid {
-    gap: 1.75rem;
-    padding: 1.5rem 0.75rem;
+    gap: 24px;
+    padding: 0;
   }
 
-  /* Override Tailwind classes for small mobile - use higher specificity */
+  .project-container .project-trigger,
   .project-container .text-4xl,
+  .project-container .text-5xl,
   .project-container .sm\:text-6xl,
+  .project-container .sm\:text-7xl,
   .project-container .md\:text-7xl,
-  .project-container .lg\:text-8xl {
-    font-size: 1.6rem !important;
-    font-weight: 700 !important;
-    line-height: 1.35 !important;
-    padding: 10px 18px !important;
-    border-radius: 10px !important;
+  .project-container .md\:text-8xl,
+  .project-container .lg\:text-8xl,
+  .project-container .lg\:text-9xl {
+    font-size: clamp(1.25rem, 4.5vw, 1.75rem) !important;
+    padding: 20px 0 !important;
   }
 
-  .link-icon-container {
-    width: 1.15em !important;
-    height: 1.15em !important;
-    margin-left: 0.5rem !important;
+  .arrow-container {
+    margin-left: 12px !important;
   }
 
-  .link-icon {
-    font-size: 0.65em !important;
+  .circle-bg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .arrow-icon {
+    font-size: 8px !important;
   }
 }
-

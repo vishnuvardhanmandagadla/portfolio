@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { FaGithub, FaLinkedin, FaYoutube, FaEnvelope, FaCode, FaArrowUp, FaMapMarkerAlt, FaArrowRight } from 'react-icons/fa';
+import { FaGithub, FaLinkedin, FaYoutube, FaEnvelope, FaArrowUp, FaMapMarkerAlt, FaArrowRight } from 'react-icons/fa';
 import { motion, useAnimation, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
+import logo from '../assets/vvlogo.png';
 import './Footer.css';
 
 const Footer = () => {
@@ -141,6 +142,9 @@ const Footer = () => {
 
   return (
     <footer ref={ref} className="footer">
+      <h2 id="footer-heading" className="sr-only">
+        Site footer and contact information
+      </h2>
       {/* Compact Scroll to Top Button */}
       <AnimatePresence>
         {showScrollTop && (
@@ -168,6 +172,24 @@ const Footer = () => {
           </motion.button>
         )}
       </AnimatePresence>
+
+      {/* Footer Watermark */}
+      <div className="footer-watermark">
+        <motion.span
+          initial={{ opacity: 0 }}
+          animate={inView ? {
+            opacity: 0.08
+          } : {
+            opacity: 0
+          }}
+          transition={{ 
+            duration: 1.2, 
+            delay: 0.2
+          }}
+        >
+          © 2025
+        </motion.span>
+      </div>
 
       {/* Background Elements */}
       <motion.div 
@@ -207,7 +229,7 @@ const Footer = () => {
                   }}
                   className="footer-logo"
                 >
-                  <FaCode />
+                  <img src={logo} alt="Vishnu Vardhan Logo" className="footer-logo-img" />
                 </motion.div>
                 <div>
                   <h3 className="footer-name">

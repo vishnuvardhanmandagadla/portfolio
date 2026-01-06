@@ -1,0 +1,286 @@
+.page-loader {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  z-index: 10000;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+    visibility 0s linear 0.8s;
+  will-change: opacity;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  overflow: hidden;
+}
+
+.page-loader--visible {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+    visibility 0s linear 0s;
+}
+
+.page-loader--reveal {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 1s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+    visibility 0s linear 1s;
+}
+
+/* Amoeba-like gradient backgrounds */
+.page-loader__background {
+  position: absolute;
+  inset: 0;
+  background: #FFE0E9;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-loader__amoeba {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(50px);
+  opacity: 0.7;
+  mix-blend-mode: multiply;
+  animation-timing-function: cubic-bezier(0.445, 0.05, 0.55, 0.95);
+}
+
+/* Primary amoebas */
+.page-loader__amoeba--1 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle at 30% 30%, #FF9EBB 0%, #FF7AA2 40%, transparent 70%);
+  animation: amoebaDance1 8s ease-in-out infinite, amoebaMorph1 10s ease-in-out infinite;
+}
+
+.page-loader__amoeba--2 {
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle at 70% 20%, #E05780 0%, #B9375E 45%, transparent 75%);
+  animation: amoebaDance2 9s ease-in-out infinite, amoebaMorph2 11s ease-in-out infinite;
+}
+
+.page-loader__amoeba--3 {
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle at 50% 80%, #8A2846 0%, #602437 50%, transparent 75%);
+  animation: amoebaDance3 7s ease-in-out infinite, amoebaMorph3 9s ease-in-out infinite;
+}
+
+/* Secondary interacting amoebas */
+.page-loader__amoeba--4 {
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle at 80% 60%, #FFC2D4 0%, #FF9EBB 35%, transparent 65%);
+  animation: amoebaDance4 8.5s ease-in-out infinite, amoebaMorph4 12s ease-in-out infinite;
+}
+
+.page-loader__amoeba--5 {
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle at 20% 70%, #B9375E 0%, #8A2846 40%, transparent 70%);
+  animation: amoebaDance5 6.5s ease-in-out infinite, amoebaMorph5 10.5s ease-in-out infinite;
+}
+
+.page-loader__amoeba--6 {
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle at 60% 40%, #FF7AA2 0%, #E05780 38%, transparent 72%);
+  animation: amoebaDance6 9.5s ease-in-out infinite, amoebaMorph6 11.5s ease-in-out infinite;
+}
+
+/* Dance animations - movement patterns (faster) */
+@keyframes amoebaDance1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  20% { transform: translate(40px, -30px) scale(1.1); }
+  40% { transform: translate(-20px, 50px) scale(0.95); }
+  60% { transform: translate(60px, 20px) scale(1.05); }
+  80% { transform: translate(-30px, -40px) scale(0.98); }
+}
+
+@keyframes amoebaDance2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(-50px, 30px) scale(1.08); }
+  50% { transform: translate(30px, -60px) scale(0.92); }
+  75% { transform: translate(-40px, -20px) scale(1.03); }
+}
+
+@keyframes amoebaDance3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  15% { transform: translate(25px, 45px) scale(1.06); }
+  35% { transform: translate(-35px, -25px) scale(0.94); }
+  65% { transform: translate(45px, -35px) scale(1.02); }
+  85% { transform: translate(-15px, 55px) scale(0.97); }
+}
+
+@keyframes amoebaDance4 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  22% { transform: translate(-35px, -45px) scale(1.07); }
+  45% { transform: translate(55px, 25px) scale(0.93); }
+  68% { transform: translate(-25px, 35px) scale(1.04); }
+  90% { transform: translate(45px, -55px) scale(0.96); }
+}
+
+@keyframes amoebaDance5 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  18% { transform: translate(30px, -25px) scale(1.09); }
+  42% { transform: translate(-45px, 40px) scale(0.91); }
+  58% { transform: translate(35px, 45px) scale(1.05); }
+  82% { transform: translate(-55px, -35px) scale(0.98); }
+}
+
+@keyframes amoebaDance6 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  28% { transform: translate(-40px, 50px) scale(1.12); }
+  38% { transform: translate(60px, -40px) scale(0.89); }
+  72% { transform: translate(-35px, -55px) scale(1.08); }
+  88% { transform: translate(50px, 35px) scale(0.94); }
+}
+
+/* Morph animations - shape changes (faster) */
+@keyframes amoebaMorph1 {
+  0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  20% { border-radius: 40% 60% 70% 30% / 30% 60% 40% 70%; }
+  40% { border-radius: 70% 30% 50% 50% / 40% 40% 60% 60%; }
+  60% { border-radius: 30% 70% 60% 40% / 70% 50% 50% 30%; }
+  80% { border-radius: 50% 50% 40% 60% / 60% 70% 30% 40%; }
+}
+
+@keyframes amoebaMorph2 {
+  0%, 100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+  25% { border-radius: 60% 40% 30% 70% / 70% 40% 60% 30%; }
+  50% { border-radius: 30% 70% 50% 50% / 60% 30% 70% 40%; }
+  75% { border-radius: 70% 30% 60% 40% / 50% 70% 40% 60%; }
+}
+
+@keyframes amoebaMorph3 {
+  0%, 100% { border-radius: 50% 50% 30% 70% / 50% 70% 30% 50%; }
+  33% { border-radius: 70% 30% 50% 50% / 30% 50% 70% 50%; }
+  66% { border-radius: 40% 60% 70% 30% / 60% 40% 50% 60%; }
+}
+
+@keyframes amoebaMorph4 {
+  0%, 100% { border-radius: 55% 45% 65% 35% / 45% 65% 35% 55%; }
+  30% { border-radius: 35% 65% 45% 55% / 65% 35% 55% 45%; }
+  60% { border-radius: 65% 35% 55% 45% / 35% 55% 45% 65%; }
+}
+
+@keyframes amoebaMorph5 {
+  0%, 100% { border-radius: 45% 55% 35% 65% / 55% 45% 65% 35%; }
+  40% { border-radius: 65% 35% 55% 45% / 35% 65% 45% 55%; }
+  70% { border-radius: 35% 65% 45% 55% / 65% 35% 55% 45%; }
+}
+
+@keyframes amoebaMorph6 {
+  0%, 100% { border-radius: 60% 40% 50% 50% / 50% 50% 40% 60%; }
+  35% { border-radius: 40% 60% 50% 50% / 50% 40% 60% 50%; }
+  70% { border-radius: 50% 50% 60% 40% / 40% 60% 50% 50%; }
+}
+
+/* Glass blur effect */
+.page-loader__glass {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* Percentage in corner */
+.page-loader__content {
+  position: relative;
+  z-index: 2;
+  padding: 40px;
+}
+
+.page-loader__percentage {
+  font-size: clamp(4.5rem, 14vw, 8rem);
+  font-weight: 200;
+  letter-spacing: -0.02em;
+  color: #522E38;
+  font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+  line-height: 1;
+  min-width: 140px;
+  text-align: center;
+  opacity: 0;
+  animation: fadeIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards;
+  transition: opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  text-shadow: 0 2px 12px rgba(82, 46, 56, 0.2);
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Reveal phase - smooth fade out */
+.page-loader--reveal .page-loader__background {
+  opacity: 0;
+  transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.page-loader--reveal .page-loader__glass {
+  opacity: 0;
+  transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.page-loader--reveal .page-loader__percentage {
+  opacity: 0;
+  transition: opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .page-loader__content {
+    padding: 32px;
+  }
+  
+  .page-loader__percentage {
+    font-size: clamp(3.5rem, 16vw, 5.5rem);
+    min-width: 120px;
+    font-weight: 200;
+  }
+  
+  .page-loader__amoeba {
+    filter: blur(35px);
+  }
+  
+  .page-loader__amoeba--1 { width: 280px; height: 280px; }
+  .page-loader__amoeba--2 { width: 320px; height: 320px; }
+  .page-loader__amoeba--3 { width: 260px; height: 260px; }
+  .page-loader__amoeba--4 { width: 220px; height: 220px; }
+  .page-loader__amoeba--5 { width: 200px; height: 200px; }
+  .page-loader__amoeba--6 { width: 240px; height: 240px; }
+}
+
+@media (max-width: 480px) {
+  .page-loader__content {
+    padding: 24px;
+  }
+  
+  .page-loader__percentage {
+    font-size: clamp(3rem, 18vw, 4.5rem);
+    font-weight: 200;
+  }
+  
+  .page-loader__glass {
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+  }
+  
+  .page-loader__amoeba--1 { width: 200px; height: 200px; }
+  .page-loader__amoeba--2 { width: 240px; height: 240px; }
+  .page-loader__amoeba--3 { width: 180px; height: 180px; }
+  .page-loader__amoeba--4 { width: 160px; height: 160px; }
+  .page-loader__amoeba--5 { width: 140px; height: 140px; }
+  .page-loader__amoeba--6 { width: 170px; height: 170px; }
+}

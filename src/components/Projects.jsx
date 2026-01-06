@@ -1,19 +1,13 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { useInView } from "react-intersection-observer";
-import { FaLink } from "react-icons/fa";
+import { FaArrowRight } from "react-icons/fa";
+import { projects } from "../data/projects";
 import "./Projects.css";
 
-const projects = [
-  { name: "Smart Attendance Manager", link: "https://github.com/vishnuvardhanmandagadla/AttendanceManager-main" },
-  { name: "Thyroid Nodule Detection", link: "https://github.com/vishnuvardhanmandagadla/thyroid-nodule-detection" },
-  { name: "Student Communication Platform", link: "https://student-communication-vs.web.app/" },
-  { name: "Time Table Generator", link: "#" },
-  { name: "SETHU Web App", link: "https://sethu-sbp.web.app/" },
-  { name: "Night Wake Studio", link: "https://nightwake-studio.web.app/" },
-];
-
 const Projects = () => {
+  const navigate = useNavigate();
   const { ref, inView } = useInView({
     triggerOnce: true,
     threshold: 0.7,
@@ -59,7 +53,7 @@ const Projects = () => {
       <div className="grid place-content-center gap-8 px-8 py-12 relative">
         {projects.map((project, index) => (
           <motion.div
-            key={index}
+            key={project.slug}
             initial={{ opacity: 0, y: 30 }}
             animate={inView ? { 
               opacity: 1, 
@@ -72,9 +66,10 @@ const Projects = () => {
               }
             } : {}}
           >
-            <FlipLink href={project.link}>
-              {project.name}
-            </FlipLink>
+            <FlipLink
+              label={project.title}
+              onClick={() => navigate(`/projects/${project.slug}`)}
+            />
           </motion.div>
         ))}
       </div>
@@ -85,20 +80,19 @@ const Projects = () => {
 const DURATION = 0.25;
 const STAGGER = 0.025;
 
-const FlipLink = ({ children, href }) => {
+const FlipLink = ({ label, onClick }) => {
   return (
-    <motion.a
+    <motion.button
       initial="initial"
       whileHover="hovered"
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="relative block overflow-hidden whitespace-nowrap text-4xl font-black uppercase sm:text-6xl md:text-7xl lg:text-8xl text-white group"
+      type="button"
+      onClick={onClick}
+      className="project-trigger relative block overflow-hidden whitespace-nowrap text-4xl font-black uppercase sm:text-6xl md:text-7xl lg:text-8xl text-white group"
       style={{ lineHeight: 1.0 }}
     >
       {/* First Layer */}
       <div className="first-layer inline-flex items-center h-full">
-        {children.split("").map((l, i) => (
+        {label.split("").map((l, i) => (
           <motion.span
             variants={{
               initial: { y: 0 },
@@ -115,18 +109,25 @@ const FlipLink = ({ children, href }) => {
             {l === " " ? "\u00A0" : l}
           </motion.span>
         ))}
-        <motion.span 
-          className="link-icon-container ml-6 opacity-0 group-hover:opacity-100"
+        <motion.div 
+          className="arrow-container ml-6 opacity-0 group-hover:opacity-100 flex items-center justify-center"
           initial={{ scale: 0.8 }}
           whileHover={{ scale: 1.1 }}
         >
-          <FaLink className="link-icon" />
-        </motion.span>
+          <div className="circle-bg rounded-full bg-white p-3 flex items-center justify-center">
+            <motion.div
+              whileHover={{ rotate: 45 }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
+            >
+              <FaArrowRight className="arrow-icon text-black" />
+            </motion.div>
+          </div>
+        </motion.div>
       </div>
 
       {/* Second Layer */}
       <div className="absolute inset-0 inline-flex items-center h-full overflow-hidden">
-        {children.split("").map((l, i) => (
+        {label.split("").map((l, i) => (
           <motion.span
             variants={{
               initial: { y: "100%" },
@@ -143,11 +144,13 @@ const FlipLink = ({ children, href }) => {
             {l === " " ? "\u00A0" : l}
           </motion.span>
         ))}
-        <span className="link-icon-container ml-6">
-          <FaLink className="link-icon" />
-        </span>
+        <div className="arrow-container ml-6 flex items-center justify-center">
+          <div className="circle-bg rounded-full bg-white p-3 flex items-center justify-center">
+            <FaArrowRight className="arrow-icon text-black text-lg" />
+          </div>
+        </div>
       </div>
-    </motion.a>
+    </motion.button>
   );
 };
 

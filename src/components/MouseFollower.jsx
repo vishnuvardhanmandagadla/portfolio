@@ -1,51 +1,77 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import "./MouseFollower.css";
 
 const MouseFollower = () => {
-  const [mousePosition, setMousePosition] = useState({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
-  const [followerPosition, setFollowerPosition] = useState({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+  const followerRef = useRef(null);
+  const targetPosition = useRef({ x: 0, y: 0 });
+  const currentPosition = useRef({ x: 0, y: 0 });
+  const animationFrameId = useRef(null);
 
   useEffect(() => {
+    const follower = followerRef.current;
+    if (!follower) return;
+
+    // Initialize position at center of screen
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    
+    targetPosition.current = { x: centerX, y: centerY };
+    currentPosition.current = { x: centerX, y: centerY };
+    
+    follower.style.transform = `translate(${centerX}px, ${centerY}px) translate(-50%, -50%) translateZ(0)`;
+
     const handleMouseMove = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
+      targetPosition.current = { x: e.clientX, y: e.clientY };
     };
 
-    document.addEventListener("mousemove", handleMouseMove);
-    return () => document.removeEventListener("mousemove", handleMouseMove);
-  }, []);
+    // Smooth animation loop
+    const animate = () => {
+      const { x: targetX, y: targetY } = targetPosition.current;
+      const { x: currentX, y: currentY } = currentPosition.current;
 
-  useEffect(() => {
-    let animationFrame;
+      // Calculate distance
+      const dx = targetX - currentX;
+      const dy = targetY - currentY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
 
-    const followMouse = () => {
-      setFollowerPosition((prev) => {
-        const dx = mousePosition.x - prev.x;
-        const dy = mousePosition.y - prev.y;
-
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        const speed = Math.max(0.08, Math.min(0.15, distance / 60)); // Controls the delay & smoothness
-
-        return {
-          x: prev.x + dx * speed,
-          y: prev.y + dy * speed,
+      // Only update if there's movement needed
+      if (distance > 0.5) {
+        // Smooth interpolation factor (lower = slower, more delayed)
+        const lerp = 0.15;
+        
+        currentPosition.current = {
+          x: currentX + dx * lerp,
+          y: currentY + dy * lerp,
         };
-      });
 
-      animationFrame = requestAnimationFrame(followMouse);
+        if (follower) {
+          follower.style.transform = `translate(${currentPosition.current.x}px, ${currentPosition.current.y}px) translate(-50%, -50%) translateZ(0)`;
+        }
+      }
+
+      animationFrameId.current = requestAnimationFrame(animate);
     };
 
-    animationFrame = requestAnimationFrame(followMouse);
+    // Start animation loop
+    animationFrameId.current = requestAnimationFrame(animate);
 
-    return () => cancelAnimationFrame(animationFrame);
-  }, [mousePosition]);
+    // Add mouse move event listener
+    document.addEventListener("mousemove", handleMouseMove);
+
+    // Cleanup
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      if (animationFrameId.current) {
+        cancelAnimationFrame(animationFrameId.current);
+      }
+    };
+  }, []);
 
   return (
     <div
+      ref={followerRef}
       className="mouse-follower"
-      style={{
-        left: `${followerPosition.x}px`,
-        top: `${followerPosition.y}px`,
-      }}
+      aria-hidden="true"
     />
   );
 };

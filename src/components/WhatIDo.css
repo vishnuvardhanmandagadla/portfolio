@@ -1,0 +1,352 @@
+.what-i-do {
+    width: 100%;
+    max-width: 100vw;
+    height: 100vh;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    padding: 2rem;
+    overflow: hidden;
+    box-sizing: border-box;
+    position: relative;
+    contain: layout style;
+  }
+  
+  .what-i-do-container {
+    width: 100%;
+    max-width: 1400px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 100%;
+    margin-left: 8%;
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* New heading styles - aligned with words */
+  .what-i-do-heading {
+    position: absolute;
+    top: 0;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #8a2b5a;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    margin-bottom: 2rem;
+    opacity: 0.8;
+    z-index: 2;
+    pointer-events: none;
+    /* Left position will be set dynamically via inline style to match word alignment */
+    transition: left 0.3s ease-out;
+  }
+  
+  .what-i-do-word-wrapper {
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    width: 100%;
+    z-index: 1;
+  }
+  
+  /* Main Amoeba - transforms into word box */
+  .what-i-do-amoeba {
+    position: absolute;
+    pointer-events: none;
+    filter: blur(60px);
+    mix-blend-mode: multiply;
+    will-change: transform, width, height, top, left, border-radius;
+  }
+  
+  .what-i-do-amoeba--main {
+    width: 320px;
+    height: 320px;
+    background: radial-gradient(circle at 30% 30%, #FF9EBB 0%, #FF7AA2 35%, #E05780 60%, #B9375E 75%, transparent 85%);
+    /* Base position - always use right and top for consistency */
+    right: var(--default-right, 10%);
+    top: var(--default-top, 35%);
+    opacity: 0.6;
+    border-radius: 50% 40% 50% 40% / 60% 30% 70% 40%;
+    transform-origin: center;
+    /* Unified smooth transitions - slower return to prevent jerking */
+    transition: top 4s cubic-bezier(0.34, 0, 0.2, 1),
+                right 4s cubic-bezier(0.34, 0, 0.2, 1),
+                width 4.5s cubic-bezier(0.34, 0, 0.2, 1),
+                height 4.5s cubic-bezier(0.34, 0, 0.2, 1),
+                border-radius 5s cubic-bezier(0.34, 0, 0.2, 1),
+                opacity 3s cubic-bezier(0.34, 0, 0.2, 1),
+                filter 4s cubic-bezier(0.34, 0, 0.2, 1);
+    z-index: 0;
+    animation: amoebaFloat 14s ease-in-out infinite;
+  }
+  
+  /* Transformed state - flows into word box like liquid */
+  .what-i-do-amoeba--main.transformed {
+    top: var(--target-top, 35%);
+    right: var(--target-right, 10%);
+    width: var(--target-width, 320px);
+    height: var(--target-height, 320px);
+    opacity: 1;
+    /* Organic border-radius that adapts to box while maintaining liquid feel */
+    border-radius: 35% 5% 35% 10% / 45% 8% 45% 15%;
+    animation: liquidAdapt 4s ease-in-out infinite;
+    filter: blur(50px);
+    /* Faster transition when transforming to hover state */
+    transition: top 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                right 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                width 2.8s cubic-bezier(0.34, 1.15, 0.64, 1),
+                height 2.8s cubic-bezier(0.34, 1.15, 0.64, 1),
+                border-radius 3s cubic-bezier(0.25, 0.8, 0.5, 1),
+                opacity 1.8s ease-out,
+                filter 2.5s ease-in-out;
+  }
+  
+  /* Liquid adaptation animation - natural morphing as it fills the container */
+  @keyframes liquidAdapt {
+    0% { 
+      /* Initial fill state - flowing into corners */
+      border-radius: 38% 3% 32% 12% / 48% 5% 42% 18%;
+      transform: translate(0, 0) scale(1);
+    }
+    20% { 
+      /* Settling - slightly more rounded on one side */
+      border-radius: 32% 8% 38% 8% / 42% 12% 48% 10%;
+      transform: translate(-1px, 0.5px) scale(1.002);
+    }
+    40% { 
+      /* Flowing - adapting to container shape */
+      border-radius: 36% 4% 34% 11% / 46% 7% 44% 14%;
+      transform: translate(0.5px, -0.5px) scale(0.998);
+    }
+    60% { 
+      /* Filling corners - edges conforming */
+      border-radius: 33% 7% 37% 9% / 43% 10% 47% 12%;
+      transform: translate(-0.5px, 0.3px) scale(1.001);
+    }
+    80% { 
+      /* Almost settled - subtle adjustment */
+      border-radius: 35% 5% 35% 10% / 45% 8% 45% 15%;
+      transform: translate(0.3px, -0.2px) scale(0.999);
+    }
+    100% { 
+      /* Back to base state - continuous subtle movement */
+      border-radius: 38% 3% 32% 12% / 48% 5% 42% 18%;
+      transform: translate(0, 0) scale(1);
+    }
+  }
+  
+  /* Secondary background amoeba - always visible */
+  .what-i-do-amoeba--bg {
+    width: 280px;
+    height: 280px;
+    background: radial-gradient(circle at 70% 20%, #E05780 0%, #B9375E 40%, #A0284A 65%, transparent 80%);
+    right: 15%;
+    top: 60%;
+    opacity: 0.4;
+    border-radius: 50%;
+    animation: amoebaFloat2 18s ease-in-out infinite;
+    animation-delay: -2s;
+    z-index: 0;
+    transform-origin: center;
+  }
+  
+  @keyframes amoebaFloat {
+    0% { 
+      transform: translate(0, 0) scale(1) rotate(0deg);
+      border-radius: 50% 40% 50% 40% / 60% 30% 70% 40%;
+    }
+    25% { 
+      transform: translate(-30px, 40px) scale(1.08) rotate(5deg);
+      border-radius: 45% 50% 45% 50% / 55% 35% 65% 45%;
+    }
+    50% { 
+      transform: translate(35px, -25px) scale(0.92) rotate(-5deg);
+      border-radius: 55% 35% 50% 45% / 65% 25% 60% 40%;
+    }
+    75% { 
+      transform: translate(-20px, 30px) scale(1.05) rotate(3deg);
+      border-radius: 48% 42% 48% 42% / 58% 32% 68% 38%;
+    }
+    100% { 
+      transform: translate(0, 0) scale(1) rotate(0deg);
+      border-radius: 50% 40% 50% 40% / 60% 30% 70% 40%;
+    }
+  }
+  
+  @keyframes amoebaFloat2 {
+    0% { 
+      transform: translate(0, 0) scale(1) rotate(0deg);
+    }
+    33% { 
+      transform: translate(40px, -30px) scale(0.85) rotate(-8deg);
+    }
+    66% { 
+      transform: translate(-25px, 35px) scale(1.1) rotate(6deg);
+    }
+    100% { 
+      transform: translate(0, 0) scale(1) rotate(0deg);
+    }
+  }
+  
+  .what-i-do-word {
+    font-size: clamp(4rem, 9vw, 8rem);
+    font-weight: 700;
+    line-height: 0.9;
+    color: #63133b;
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    white-space: nowrap;
+    width: auto;
+    text-align: left;
+    margin: 0;
+    transform: translateY(100%);
+    background: linear-gradient(45deg, #63133b, #8a2b5a, #63133b, #4a0f2c);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    position: relative;
+    will-change: transform;
+  }
+
+  .what-i-do-word:nth-child(1) { 
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    animation-delay: 0.1s;
+  }
+  .what-i-do-word:nth-child(2) { 
+    font-size: clamp(3.8rem, 8.5vw, 7.5rem);
+    animation-delay: 0.2s;
+  }
+  .what-i-do-word:nth-child(3) { 
+    font-size: clamp(4rem, 9vw, 8rem);
+    animation-delay: 0.3s;
+  }
+  .what-i-do-word:nth-child(4) { 
+    font-size: clamp(3.6rem, 8.2vw, 7.2rem);
+    animation-delay: 0.4s;
+  }
+  .what-i-do-word:nth-child(5) { 
+    font-size: clamp(3.7rem, 8.3vw, 7.3rem);
+    animation-delay: 0.5s;
+  }
+  
+  @keyframes swipeUp {
+    to {
+      transform: translateY(0);
+    }
+  }
+  
+  /* Scroll-triggered animation - intro animation unchanged */
+  .what-i-do.in-view .what-i-do-word {
+    animation: swipeUp 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    animation-fill-mode: forwards;
+  }
+  
+  /* Ensure animation doesn't run until in view */
+  .what-i-do:not(.in-view) .what-i-do-word {
+    animation: none;
+    transform: translateY(100%);
+  }
+  
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .what-i-do {
+      padding: 1.5rem 1rem;
+      height: 100vh;
+    }
+  
+    .what-i-do-container {
+      margin-left: 5%;
+      gap: 0.25rem;
+    }
+  
+    .what-i-do-heading {
+      font-size: 0.875rem;
+      margin-bottom: 1.5rem;
+      left: 5%; /* Same as container margin on mobile */
+    }
+  
+    .what-i-do-word {
+      font-size: clamp(2.8rem, 11vw, 5.5rem);
+      line-height: 0.9;
+      letter-spacing: -0.02em;
+      transform: translateY(100%);
+    }
+  
+    .what-i-do-word:nth-child(1) { 
+      font-size: clamp(2.3rem, 9vw, 4.5rem);
+      animation-delay: 0.1s;
+    }
+    .what-i-do-word:nth-child(2) { 
+      font-size: clamp(2.5rem, 9.5vw, 5rem);
+      animation-delay: 0.15s;
+    }
+    .what-i-do-word:nth-child(3) { 
+      font-size: clamp(2.8rem, 11vw, 5.5rem);
+      animation-delay: 0.2s;
+    }
+    .what-i-do-word:nth-child(4) { 
+      font-size: clamp(2.4rem, 9.2vw, 4.7rem);
+      animation-delay: 0.25s;
+    }
+    .what-i-do-word:nth-child(5) { 
+      font-size: clamp(2.5rem, 9.3vw, 4.8rem);
+      animation-delay: 0.3s;
+    }
+  
+    @keyframes swipeUp {
+      to {
+        transform: translateY(0);
+      }
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .what-i-do {
+      padding: 1rem 0.75rem;
+      height: 100vh;
+    }
+  
+    .what-i-do-container {
+      margin-left: 4%;
+      gap: 0.2rem;
+    }
+  
+    .what-i-do-heading {
+      font-size: 0.75rem;
+      margin-bottom: 1rem;
+      letter-spacing: 0.1em;
+      left: 4%; /* Same as container margin on mobile */
+    }
+  
+    .what-i-do-word {
+      font-size: clamp(2.2rem, 13vw, 4.8rem);
+      line-height: 0.9;
+      transform: translateY(100%);
+    }
+  
+    .what-i-do-word:nth-child(1) { 
+      font-size: clamp(1.8rem, 10vw, 3.8rem);
+      animation-delay: 0.1s;
+    }
+    .what-i-do-word:nth-child(2) { 
+      font-size: clamp(2rem, 11vw, 4.2rem);
+      animation-delay: 0.15s;
+    }
+    .what-i-do-word:nth-child(3) { 
+      font-size: clamp(2.2rem, 13vw, 4.8rem);
+      animation-delay: 0.2s;
+    }
+    .what-i-do-word:nth-child(4) { 
+      font-size: clamp(1.9rem, 10.5vw, 4rem);
+      animation-delay: 0.25s;
+    }
+    .what-i-do-word:nth-child(5) { 
+      font-size: clamp(2rem, 10.8vw, 4.1rem);
+      animation-delay: 0.3s;
+    }
+  }

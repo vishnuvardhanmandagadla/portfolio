@@ -1,171 +1,417 @@
-import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import React, { useEffect, useRef, useState, useCallback, memo, useMemo } from "react";
+import { useLocation, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { LocomotiveScrollProvider, useLocomotiveScroll } from 'react-locomotive-scroll';
 import Navbar from './Navbar';
 import Hero from './Hero';
-import About from './About';
-import Skills from './Skills';
-import Projects from './Projects';
-import Contact from './Contacts';
-import Footer from './Footer';
-import MouseFollower from "./MouseFollower";
-import Vido from "./video";
-import Privacy from './Privacy';
-import Terms from './Terms';
-import Sitemap from './Sitemap';
+import WhatIDo from './WhatIDo';
+// Lazy load heavy components for better initial load performance
+const BioSection = React.lazy(() => import('./BioSection'));
+const Skills = React.lazy(() => import('./Skills'));
+const Projects = React.lazy(() => import('./Projects'));
+const Contact = React.lazy(() => import('./Contacts'));
+const SolarSystem = React.lazy(() => import('./SolarSystem'));
+const Footer = React.lazy(() => import('./Footer'));
+const MouseFollower = React.lazy(() => import("./MouseFollower"));
+const Vido = React.lazy(() => import("./video"));
 
-const PortfolioContent = () => {
-  const [scrollY, setScrollY] = useState(0);
+// Loading fallback component
+const SectionLoader = () => (
+  <div style={{ 
+    minHeight: '100vh', 
+    display: 'flex', 
+    alignItems: 'center', 
+    justifyContent: 'center',
+    opacity: 0.5
+  }} />
+);
+
+// Portfolio Sections Component - Contains all portfolio content
+const PortfolioSections = memo(({ containerRef, scrollTarget, isLoaderDone }) => {
+  const { scroll } = useLocomotiveScroll();
   const [deviceType, setDeviceType] = useState('desktop');
 
   useEffect(() => {
+    // Debounce resize handler for better performance
+    let resizeTimeout;
     const handleResize = () => {
-      setDeviceType(window.innerWidth < 768 ? 'mobile' : 'desktop');
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        setDeviceType(window.innerWidth < 768 ? 'mobile' : 'desktop');
+        if (scroll && typeof scroll.update === 'function') {
+          setTimeout(() => scroll.update(), 100);
+        }
+      }, 150);
     };
     
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-    
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    setDeviceType(window.innerWidth < 768 ? 'mobile' : 'desktop');
+    window.addEventListener('resize', handleResize, { passive: true });
     
     return () => {
+      clearTimeout(resizeTimeout);
       window.removeEventListener('resize', handleResize);
-      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [scroll]);
+
+  // Initialize scroll and update on mount/device change
+  useEffect(() => {
+    if (!scroll) return;
+
+    const initTimeout = setTimeout(() => {
+      if (scroll && typeof scroll.update === 'function') {
+        scroll.update();
+      }
+    }, 200);
+
+    return () => {
+      clearTimeout(initTimeout);
+    };
+  }, [scroll, deviceType]);
+
+  // Update scroll when lazy-loaded sections mount
+  useEffect(() => {
+    if (!scroll || !isLoaderDone) return;
+
+    let updateDebounce = null;
+    let updateCount = 0;
+    const maxUpdates = 3; // Limit updates to prevent infinite loops
+
+    const observer = new MutationObserver(() => {
+      if (updateCount >= maxUpdates) return;
+
+      clearTimeout(updateDebounce);
+      updateDebounce = setTimeout(() => {
+        if (scroll && typeof scroll.update === 'function') {
+          scroll.update();
+          updateCount++;
+        }
+      }, 300);
+    });
+
+    const container = containerRef.current;
+    if (container) {
+      observer.observe(container, {
+        childList: true,
+        subtree: false, // Only watch direct children
+      });
+    }
+
+    // Initial update after sections load
+    const updateTimeout = setTimeout(() => {
+      if (scroll && typeof scroll.update === 'function') {
+        scroll.update();
+      }
+    }, 500);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(updateTimeout);
+      clearTimeout(updateDebounce);
+    };
+  }, [scroll, isLoaderDone, containerRef]);
+
+  // Update scroll when Footer loads (prevents white space at bottom)
+  useEffect(() => {
+    if (!scroll || !isLoaderDone) return;
+
+    const timeoutId = setTimeout(() => {
+      const footerSection = document.getElementById('footer');
+      if (footerSection && scroll && typeof scroll.update === 'function') {
+        scroll.update();
+      }
+    }, 500);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [scroll, isLoaderDone]);
+
+  // Handle scroll to target section
+  useEffect(() => {
+    if (!scrollTarget) return;
+    const targetSection = document.getElementById(scrollTarget);
+    if (!targetSection) return;
+
+    if (scroll && typeof scroll.scrollTo === 'function') {
+      // Update scroll limits before navigating
+      scroll.update();
+
+      setTimeout(() => {
+        scroll.scrollTo(targetSection, {
+          offset: 0,
+          duration: 1100,
+          easing: [0.25, 0.0, 0.35, 1.0],
+          callback: () => {
+            setTimeout(() => scroll.update(), 100);
+          }
+        });
+      }, 50);
+    } else {
+      targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [scrollTarget, scroll]);
+
+  const baseSectionStyles = useMemo(() => ({
+    width: '100%',
+    maxWidth: '100vw',
+    overflowX: 'hidden',
+    boxSizing: 'border-box',
+  }), []);
+
+  const scrollToContact = useCallback(() => {
+    const contactSection = document.getElementById('contact');
+    if (!contactSection) return;
+
+    if (scroll && typeof scroll.scrollTo === 'function') {
+      scroll.scrollTo(contactSection, {
+        offset: 0,
+        duration: 1200,
+        easing: [0.25, 0.0, 0.35, 1.0],
+      });
+    } else {
+      contactSection.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  }, [scroll]);
+
+  return (
+    <motion.div
+      data-scroll-container
+      ref={containerRef}
+      className="parallax-scene"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      style={{ 
+        position: 'relative', 
+        width: '100%', 
+        maxWidth: '100vw', 
+        overflowX: 'hidden',
+        minHeight: '100vh'
+      }}
+    >
+      <Navbar />
+
+      <main id="main-content" role="main" style={{ position: 'relative' }}>
+        {/* Hero Section */}
+        <section
+          id="hero"
+          data-scroll-id="home"
+          aria-labelledby="hero-heading"
+          data-scroll-section
+          style={baseSectionStyles}
+        >
+          <Hero onScrollToContact={scrollToContact} isLoaderDone={isLoaderDone} />
+        </section>
+
+        {/* What I Do Section */}
+        <section
+          id="what-i-do"
+          data-scroll-id="what-i-do"
+          aria-label="What I Do"
+          data-scroll-section
+          data-scroll-section-inview
+          style={{
+            ...baseSectionStyles,
+            overflow: 'hidden',
+          }}
+        >
+          <WhatIDo />
+        </section>
+
+        {/* About Section */}
+        <section
+          id="about"
+          data-scroll-id="about"
+          aria-labelledby="bio-heading"
+          data-scroll-section
+          style={baseSectionStyles}
+        >
+          <React.Suspense fallback={<SectionLoader />}>
+            <BioSection />
+          </React.Suspense>
+        </section>
+
+        {/* Skills Section */}
+        <section
+          id="skills"
+          data-scroll-id="skills"
+          aria-labelledby="skills-heading"
+          data-scroll-section
+          style={baseSectionStyles}
+        >
+          <React.Suspense fallback={<SectionLoader />}>
+            <Skills />
+          </React.Suspense>
+        </section>
+
+        {/* Video Section */}
+        <section
+          id="video"
+          data-scroll-id="work"
+          aria-labelledby="projects-showcase-heading"
+          data-scroll-section
+          style={baseSectionStyles}
+        >
+          <React.Suspense fallback={<SectionLoader />}>
+            <Vido />
+          </React.Suspense>
+        </section>
+
+        {/* Projects Section */}
+        <section
+          id="projects"
+          data-scroll-id="projects"
+          aria-label="Projects"
+          data-scroll-section
+          style={baseSectionStyles}
+        >
+          <React.Suspense fallback={<SectionLoader />}>
+            <Projects />
+          </React.Suspense>
+        </section>
+
+        {/* Contact Section */}
+        <section
+          id="contact"
+          data-scroll-id="contact"
+          aria-labelledby="contact-heading"
+          data-scroll-section
+          style={{
+            ...baseSectionStyles,
+            minHeight: '100vh',
+          }}
+        >
+          <React.Suspense fallback={<SectionLoader />}>
+            <Contact />
+          </React.Suspense>
+        </section>
+
+        {/* Solar System Section */}
+        <section
+          id="solar-system"
+          data-scroll-id="solar-system"
+          aria-label="Solar System Animation"
+          data-scroll-section
+          style={baseSectionStyles}
+        >
+          <React.Suspense fallback={<SectionLoader />}>
+            <SolarSystem />
+          </React.Suspense>
+        </section>
+
+        {/* Footer */}
+        <section
+          id="footer"
+          data-scroll-id="footer"
+          aria-labelledby="footer-heading"
+          data-scroll-section
+          style={{
+            ...baseSectionStyles,
+            position: 'relative',
+            zIndex: 10,
+            paddingBottom: '0',
+          }}
+        >
+          <React.Suspense fallback={<SectionLoader />}>
+            <Footer />
+          </React.Suspense>
+        </section>
+      </main>
+      
+      <React.Suspense fallback={null}>
+        <MouseFollower />
+      </React.Suspense>
+    </motion.div>
+  );
+});
+
+PortfolioSections.displayName = 'PortfolioSections';
+
+// Main Portfolio Content Component - Wraps sections with Locomotive Scroll
+const MainCo = ({ isLoaderDone }) => {
+  const containerRef = useRef(null);
+  const [enableSmoothScroll, setEnableSmoothScroll] = useState(true);
+  const [scrollTarget, setScrollTarget] = useState(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const isMobile = window.innerWidth <= 768;
+    
+    const updateSmoothPreference = () => {
+      setEnableSmoothScroll(!mediaQuery.matches && !isMobile);
+    };
+
+    updateSmoothPreference();
+    mediaQuery.addEventListener('change', updateSmoothPreference);
+    
+    const handleResize = () => {
+      const nowMobile = window.innerWidth <= 768;
+      if (nowMobile !== isMobile) {
+        setEnableSmoothScroll(!mediaQuery.matches && !nowMobile);
+      }
+    };
+    window.addEventListener('resize', handleResize, { passive: true });
+
+    return () => {
+      mediaQuery.removeEventListener('change', updateSmoothPreference);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
-  const getParallaxValue = (speed, offset = 0) => {
-    if (deviceType === 'mobile') return 0;
-    return Math.max(0, scrollY - offset) * speed;
-  };
-
-  const sectionOffsets = {
-    hero: 0,
-    about: 1000,
-    skills: 2000,
-    video: 3000,
-    projects: 4000,
-    contact: 5000,
-    footer: 6000
-  };
+  // Handle scroll target from route state
+  useEffect(() => {
+    if (!location.state?.scrollTo) return;
+    setScrollTarget(location.state.scrollTo);
+    navigate(location.pathname, { replace: true, state: null });
+  }, [location, navigate]);
 
   return (
-    <div className="parallax-scene" style={{ position: 'relative', width: '100%', maxWidth: '100vw', overflowX: 'hidden' }}>
-      <Navbar scrollY={scrollY} />
-      
-      {/* Hero Section */}
-      <div id="hero" style={{
-        transform: `translateY(${getParallaxValue(0.3, sectionOffsets.hero)}px)`,
-        transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-        willChange: 'transform',
-        opacity: 1 - Math.min(scrollY / 300, 0.2),
-        width: '100%',
-        maxWidth: '100vw',
-        overflowX: 'hidden',
-        boxSizing: 'border-box'
-      }}>
-        <Hero />
-      </div>
-
-      {/* About Section */}
-      <div id="about" style={{
-        transform: `translateY(${getParallaxValue(0.2, sectionOffsets.about)}px)`,
-        transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-        willChange: 'transform',
-        width: '100%',
-        maxWidth: '100vw',
-        overflowX: 'hidden',
-        boxSizing: 'border-box'
-      }}>
-        <About />
-      </div>
-
-      {/* Skills Section */}
-      <div id="skills" style={{
-        transform: `translateY(${getParallaxValue(0.15, sectionOffsets.skills)}px)`,
-        transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-        willChange: 'transform',
-        width: '100%',
-        maxWidth: '100vw',
-        overflowX: 'hidden',
-        boxSizing: 'border-box'
-      }}>
-        <Skills />
-      </div>
-
-      {/* Video Section */}
-      <div id="video" style={{
-        transform: `translateY(${getParallaxValue(0.1, sectionOffsets.video)}px)`,
-        transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-        willChange: 'transform',
-        width: '100%',
-        maxWidth: '100vw',
-        overflowX: 'hidden',
-        boxSizing: 'border-box'
-      }}>
-        <Vido />
-      </div>
-
-      {/* Projects Section */}
-      <div id="projects" style={{
-        transform: `translateY(${getParallaxValue(0.08, sectionOffsets.projects)}px)`,
-        transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-        willChange: 'transform',
-        width: '100%',
-        maxWidth: '100vw',
-        overflowX: 'hidden',
-        boxSizing: 'border-box'
-      }}>
-        <Projects />
-      </div>
-
-      {/* Contact Section */}
-      <div id="contact" style={{
-        transform: `translateY(${getParallaxValue(0.12, sectionOffsets.contact)}px)`,
-        transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-        willChange: 'transform',
-        minHeight: '100vh',
-        width: '100%',
-        maxWidth: '100vw',
-        overflowX: 'hidden',
-        boxSizing: 'border-box'
-      }}>
-        <Contact />
-      </div>
-
-      {/* Footer */}
-      <div id="footer" style={{
-        transform: `translateY(${getParallaxValue(0.05, sectionOffsets.footer)}px)`,
-        transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-        willChange: 'transform',
-        position: 'relative',
-        zIndex: 10,
-        width: '100%',
-        maxWidth: '100vw',
-        overflowX: 'hidden',
-        boxSizing: 'border-box'
-      }}>
-        <Footer />
-      </div>
-      
-      <MouseFollower />
-    </div>
-  );
-};
-
-const MainCo = () => {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<PortfolioContent />} />
-        <Route path="/privacy" element={<Privacy />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/sitemap" element={<Sitemap />} />
-      </Routes>
-    </Router>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <LocomotiveScrollProvider
+        options={{
+          smooth: enableSmoothScroll,
+          lerp: enableSmoothScroll ? 0.08 : 1,
+          multiplier: enableSmoothScroll ? 0.7 : 1,
+          class: 'is-inview',
+          getDirection: true,
+          resetNativeScroll: true,
+          firefoxMultiplier: 50,
+          touchMultiplier: 2,
+          scrollFromAnywhere: false,
+          reloadOnContextChange: false,
+          smartphone: {
+            smooth: false,
+            lerp: 1,
+            multiplier: 1,
+          },
+          tablet: {
+            smooth: false,
+            lerp: 1,
+            multiplier: 1,
+          },
+        }}
+        watch={[enableSmoothScroll]}
+        containerRef={containerRef}
+      >
+        <PortfolioSections 
+          containerRef={containerRef} 
+          scrollTarget={scrollTarget} 
+          isLoaderDone={isLoaderDone} 
+        />
+      </LocomotiveScrollProvider>
+    </motion.div>
   );
 };
 

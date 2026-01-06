@@ -32,6 +32,22 @@
   overflow-y: hidden;
   position: relative;
   box-sizing: border-box;
+  contain: layout style;
+}
+
+/* Paper Airplane with Infinity Trail Background */
+.paper-plane-trail {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%) scaleY(1.3);
+  width: 100%;
+  max-width: none;
+  height: auto;
+  z-index: 0;
+  opacity: 0.12;
+  pointer-events: none;
 }
 
 /* Contact Us Heading Styles */
@@ -46,7 +62,7 @@
   pointer-events: none; /* Allow clicks to pass through to circle */
 }
 
-.contact-heading h1 {
+.contact-heading h2 {
  
   padding-left: 1rem; /* Adjust based on actual left spacing */
   font-size: 12rem;
@@ -54,7 +70,7 @@
   color: #55062d;
   text-transform: uppercase;
   letter-spacing: 6px;
-  text-shadow: 4px 4px 8px rgba(85, 6, 45, 0.4);
+  text-shadow: 2px 2px 4px rgba(85, 6, 45, 0.15);
   margin: 0;
   padding: 0;
   line-height: 1;
@@ -666,7 +682,12 @@
     padding: 1.5rem;
   }
 
-  .contact-heading h1 {
+  .paper-plane-trail {
+    width: 100%;
+    opacity: 0.1;
+  }
+
+  .contact-heading h2 {
     font-size: 4rem;
     letter-spacing: 4px;
     padding-left: 0.5rem;
@@ -712,7 +733,7 @@
   }
 
   .contact-form-overlay h3 {
-    font-size: 1.85rem;
+    font-size: 2.2rem;
     margin-bottom: 1.5rem;
     letter-spacing: 0.5px;
   }
@@ -721,10 +742,10 @@
   .contact-form textarea,
   .contact-form select,
   .custom-dropdown-trigger {
-    font-size: 1rem;
-    padding: 16px 16px 16px 48px;
-    border-radius: 12px;
-    min-height: 52px;
+    font-size: 1.15rem;
+    padding: 18px 18px 18px 52px;
+    border-radius: 14px;
+    min-height: 56px;
   }
 
   .input-icon {
@@ -733,10 +754,10 @@
   }
 
   .contact-form button {
-    font-size: 1rem;
-    padding: 16px 32px;
-    min-height: 52px;
-    border-radius: 12px;
+    font-size: 1.15rem;
+    padding: 18px 36px;
+    min-height: 56px;
+    border-radius: 14px;
     font-weight: 600;
     letter-spacing: 0.5px;
     margin-top: 12px;
@@ -772,7 +793,12 @@
     padding: 1rem;
   }
 
-  .contact-heading h1 {
+  .paper-plane-trail {
+    width: 100%;
+    opacity: 0.08;
+  }
+
+  .contact-heading h2 {
     font-size: 3rem;
     letter-spacing: 3px;
     padding-left: 0.25rem;

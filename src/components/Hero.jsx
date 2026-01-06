@@ -1,41 +1,116 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback, memo } from "react";
 import ReactTypingEffect from "react-typing-effect";
 import { gsap } from "gsap";
 import "./Hero.css";
 import resumePDF from '../assets/Vishnu_Resume.pdf';
 
-const Hero = () => {
+const RIPPLE_GROWTH_RATE = 0.012;
+const RIPPLE_MAX_PROGRESS = 1.2;
+const HERO_RIPPLE_LIFETIME = 1600;
+
+// Memoize shape generation function
+const generateNonCollidingShapes = (count) => {
+  const newShapes = [];
+  const types = ['circle', 'square', 'triangle'];
+  const colors = [
+    'hsla(290, 70%, 60%, 0.7)', 
+    'hsla(300, 70%, 60%, 0.7)',
+    'hsla(310, 70%, 60%, 0.7)'
+  ];
+  
+  const gridSize = 10;
+  const grid = Array(gridSize).fill().map(() => Array(gridSize).fill(false));
+  
+  for (let i = 0; i < count; i++) {
+    let attempts = 0;
+    let placed = false;
+    
+    while (!placed && attempts < 100) {
+      attempts++;
+      const type = types[Math.floor(Math.random() * types.length)];
+      const isLeftSide = Math.random() > 0.5;
+      
+      const xGrid = isLeftSide 
+        ? Math.floor(Math.random() * (gridSize * 0.3))
+        : Math.floor(gridSize * 0.7 + Math.random() * (gridSize * 0.3));
+      
+      const yGrid = Math.floor(Math.random() * gridSize);
+      
+      if (!grid[xGrid][yGrid]) {
+        const x = (xGrid / gridSize) * 100;
+        const y = (yGrid / gridSize) * 100;
+        
+        newShapes.push({
+          id: Date.now() + i,
+          type,
+          x,
+          y,
+          size: 20 + Math.random() * 30,
+          rotation: Math.random() * 360,
+          opacity: 0,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          scale: 1,
+          active: false,
+          activationIntensity: 0,
+          lastActivatedBy: null
+        });
+        
+        grid[xGrid][yGrid] = true;
+        placed = true;
+      }
+    }
+  }
+  return newShapes;
+};
+
+const Hero = memo(({ onScrollToContact, isLoaderDone = false }) => {
   const nameRef = useRef(null);
   const wordsRef = useRef(null);
   const heroRef = useRef(null);
   const [ripples, setRipples] = useState([]);
   const [shapes, setShapes] = useState([]);
-  const activeShapesRef = useRef(new Set());
+  const shapeDecayRef = useRef(null);
 
   useEffect(() => {
-    // Initialize non-colliding random shapes when component mounts
-    const initialShapes = generateNonCollidingShapes(20);
-    setShapes(initialShapes);
+    // Wait for loader to complete before starting animations
+    if (!isLoaderDone) {
+      return;
+    }
 
-    // Animate shapes in on load
-    gsap.to(".hidden-shape", {
-      opacity: 0.7,
-      duration: 1.5,
-      ease: "power2.out",
-      stagger: 0.05
-    });
+    // Small delay after loader completes to prevent jitter
+    const isMobile = window.innerWidth <= 768;
+    const initTimer = setTimeout(() => {
+      // Reduce shapes on mobile for better performance
+      const shapeCount = isMobile ? 5 : 20;
+      const initialShapes = generateNonCollidingShapes(shapeCount);
+      setShapes(initialShapes);
 
-    // Then fade them out after 2 seconds
-    gsap.to(".hidden-shape", {
-      opacity: 0,
-      duration: 1,
-      delay: 2,
-      ease: "power2.in"
-    });
+      // Skip shape animations on mobile for better performance
+      if (!isMobile) {
+        // Animate shapes in on load
+        gsap.to(".hidden-shape", {
+          opacity: 0.7,
+          duration: 1.5,
+          ease: "power2.out",
+          stagger: 0.05
+        });
+
+        // Then fade them out after 2 seconds
+        gsap.to(".hidden-shape", {
+          opacity: 0,
+          duration: 1,
+          delay: 2,
+          ease: "power2.in"
+        });
+      } else {
+        // On mobile, just hide shapes immediately
+        gsap.set(".hidden-shape", { opacity: 0 });
+      }
+    }, 100);
 
     const handleIntersection = (entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
+        if (entry.isIntersecting && isLoaderDone) {
           reverseDisperseEffect();
           animateWords();
         }
@@ -43,7 +118,6 @@ const Hero = () => {
     };
 
     // Lower threshold for mobile to trigger animation earlier
-    const isMobile = window.innerWidth <= 768;
     const observer = new IntersectionObserver(handleIntersection, {
       threshold: isMobile ? 0.1 : 0.5,
     });
@@ -51,25 +125,26 @@ const Hero = () => {
     const currentNameRef = nameRef.current;
     const currentWordsRef = wordsRef.current;
     
-    if (currentNameRef) {
+    if (currentNameRef && isLoaderDone) {
       observer.observe(currentNameRef);
     }
-    if (currentWordsRef) {
+    if (currentWordsRef && isLoaderDone) {
       observer.observe(currentWordsRef);
     }
 
-    // Also trigger animation immediately on mobile if already visible
-    if (isMobile && currentWordsRef) {
+    // Also trigger animation immediately on mobile if already visible (but only after loader)
+    if (isMobile && currentWordsRef && isLoaderDone) {
       const rect = currentWordsRef.getBoundingClientRect();
       const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
       if (isVisible) {
         setTimeout(() => {
           animateWords();
-        }, 500);
+        }, 600);
       }
     }
 
     return () => {
+      clearTimeout(initTimer);
       if (currentNameRef) {
         observer.unobserve(currentNameRef);
       }
@@ -78,60 +153,15 @@ const Hero = () => {
       }
       observer.disconnect();
     };
-  }, []);
+  }, [isLoaderDone]);
 
-  const generateNonCollidingShapes = (count) => {
-    const newShapes = [];
-    const types = ['circle', 'square', 'triangle'];
-    const colors = [
-      'hsla(290, 70%, 60%, 0.7)', 
-      'hsla(300, 70%, 60%, 0.7)',
-      'hsla(310, 70%, 60%, 0.7)'
-    ];
-    
-    const gridSize = 10;
-    const grid = Array(gridSize).fill().map(() => Array(gridSize).fill(false));
-    
-    for (let i = 0; i < count; i++) {
-      let attempts = 0;
-      let placed = false;
-      
-      while (!placed && attempts < 100) {
-        attempts++;
-        const type = types[Math.floor(Math.random() * types.length)];
-        const isLeftSide = Math.random() > 0.5;
-        
-        const xGrid = isLeftSide 
-          ? Math.floor(Math.random() * (gridSize * 0.3))
-          : Math.floor(gridSize * 0.7 + Math.random() * (gridSize * 0.3));
-        
-        const yGrid = Math.floor(Math.random() * gridSize);
-        
-        if (!grid[xGrid][yGrid]) {
-          const x = (xGrid / gridSize) * 100;
-          const y = (yGrid / gridSize) * 100;
-          
-          newShapes.push({
-            id: Date.now() + i,
-            type,
-            x,
-            y,
-            size: 20 + Math.random() * 30,
-            rotation: Math.random() * 360,
-            opacity: 0,
-            color: colors[Math.floor(Math.random() * colors.length)],
-            scale: 1,
-            active: false,
-            lastActivatedBy: null
-          });
-          
-          grid[xGrid][yGrid] = true;
-          placed = true;
-        }
+  useEffect(() => {
+    return () => {
+      if (shapeDecayRef.current) {
+        cancelAnimationFrame(shapeDecayRef.current);
       }
-    }
-    return newShapes;
-  };
+    };
+  }, []);
 
   const reverseDisperseEffect = () => {
     const letters = nameRef.current?.querySelectorAll(".letter");
@@ -167,10 +197,45 @@ const Hero = () => {
     }
   };
 
+  const decayActiveShapes = useCallback(() => {
+    let nextHasActive = false;
+
+    setShapes((prevShapes) =>
+      prevShapes.map((shape) => {
+        const currentIntensity = shape.activationIntensity ?? 0;
+        if (currentIntensity > 0.01) {
+          const nextIntensity = Math.max(0, currentIntensity - 0.06);
+          if (nextIntensity > 0.01) {
+            nextHasActive = true;
+          }
+          return {
+            ...shape,
+            activationIntensity: nextIntensity,
+            active: nextIntensity > 0.03,
+            scale: 1 + nextIntensity * 0.25,
+          };
+        }
+        return shape;
+      })
+    );
+
+    if (nextHasActive) {
+      shapeDecayRef.current = requestAnimationFrame(decayActiveShapes);
+    } else {
+      shapeDecayRef.current = null;
+    }
+  }, []);
+
   const createRipple = (e) => {
-    if (!heroRef.current) return;
+    // Disable ripples on mobile for better performance
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile || !heroRef.current) return;
     
     const rect = heroRef.current.getBoundingClientRect();
+    if (shapeDecayRef.current) {
+      cancelAnimationFrame(shapeDecayRef.current);
+      shapeDecayRef.current = null;
+    }
     const rippleId = Date.now();
     const newRipple = {
       x: e.clientX - rect.left,
@@ -182,67 +247,65 @@ const Hero = () => {
     };
 
     setRipples((prev) => [...prev, newRipple]);
-    
-    // Track which shapes this ripple activates
-    const activatedShapes = new Set();
-    
+
+    let currentProgress = 0;
+
     const animateRipple = () => {
-      setRipples(prev => prev.map(r => {
-        if (r.id === rippleId) {
-          const progress = r.progress + 0.02;
-          const radius = r.size * 7.5 * progress;
-          
-          setShapes(prevShapes => 
-            prevShapes.map(shape => {
-              const shapeX = (shape.x / 100) * rect.width;
-              const shapeY = (shape.y / 100) * rect.height;
-              const distance = Math.sqrt(
-                Math.pow(r.x - shapeX, 2) + 
-                Math.pow(r.y - shapeY, 2)
-              );
-              
-              const isActive = distance < radius + (shape.size / 2);
-              
-              if (isActive) {
-                activatedShapes.add(shape.id);
-                activeShapesRef.current.add(shape.id);
-                return {
-                  ...shape,
-                  active: true,
-                  scale: 1.2,
-                  lastActivatedBy: rippleId
-                };
-              }
-              return shape;
-            })
+      currentProgress += RIPPLE_GROWTH_RATE;
+      const clampedProgress = Math.min(currentProgress, 1);
+      const radius = newRipple.size * 7.5 * clampedProgress;
+
+      setRipples((prev) =>
+        prev
+          .map((r) =>
+            r.id === rippleId
+              ? {
+                  ...r,
+                  progress: currentProgress,
+                  radius,
+                }
+              : r
+          )
+          .filter(Boolean)
+      );
+
+      setShapes((prevShapes) =>
+        prevShapes.map((shape) => {
+          const shapeX = (shape.x / 100) * rect.width;
+          const shapeY = (shape.y / 100) * rect.height;
+          const distance = Math.sqrt(
+            Math.pow(newRipple.x - shapeX, 2) + Math.pow(newRipple.y - shapeY, 2)
           );
-          
-          if (progress >= 1) {
-            // When ripple completes, fade out its shapes
-            setTimeout(() => {
-              setShapes(prevShapes => 
-                prevShapes.map(shape => {
-                  if (activatedShapes.has(shape.id)) {
-                    activeShapesRef.current.delete(shape.id);
-                    return {
-                      ...shape,
-                      active: false,
-                      scale: 1
-                    };
-                  }
-                  return shape;
-                })
-              );
-            }, 50);
-            return null;
+
+          const ringThickness = Math.max(shape.size * 0.75, 45);
+          const innerRadius = Math.max(0, radius - ringThickness);
+          const outerRadius = radius + ringThickness;
+          const isWithinRing = distance >= innerRadius && distance <= outerRadius;
+
+          let activationIntensity = shape.activationIntensity ?? 0;
+
+          if (isWithinRing) {
+            activationIntensity = Math.min(1, activationIntensity + 0.22);
+          } else {
+            activationIntensity = Math.max(0, activationIntensity - 0.05);
           }
-          return {...r, progress, radius};
-        }
-        return r;
-      }).filter(Boolean));
-      
-      if (newRipple.progress < 1) {
+
+          const nextScale = 1 + activationIntensity * 0.25;
+
+          return {
+            ...shape,
+            activationIntensity,
+            active: activationIntensity > 0.03,
+            scale: nextScale,
+            lastActivatedBy: isWithinRing ? rippleId : shape.lastActivatedBy,
+          };
+        })
+      );
+
+      if (currentProgress < RIPPLE_MAX_PROGRESS) {
         requestAnimationFrame(animateRipple);
+      } else if (!shapeDecayRef.current) {
+        shapeDecayRef.current = requestAnimationFrame(decayActiveShapes);
       }
     };
     
@@ -250,15 +313,20 @@ const Hero = () => {
     
     setTimeout(() => {
       setRipples((prev) => prev.filter((r) => r.id !== rippleId));
-    }, 1000);
+    }, HERO_RIPPLE_LIFETIME);
   };
 
-  const scrollToContact = () => {
+  const scrollToContact = useCallback(() => {
+    if (typeof onScrollToContact === 'function') {
+      onScrollToContact();
+      return;
+    }
+
     const contactSection = document.getElementById('contact');
     if (contactSection) {
-      contactSection.scrollIntoView({ behavior: 'smooth' });
+      contactSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  };
+  }, [onScrollToContact]);
 
   const downloadResume = () => {
   const link = document.createElement('a');
@@ -271,19 +339,19 @@ const Hero = () => {
   
 
   const renderShape = (shape) => {
+    const activation =
+      Math.min(Math.max(shape.activationIntensity ?? (shape.active ? 1 : 0), 0), 1);
     const style = {
       left: `${shape.x}%`,
       top: `${shape.y}%`,
       width: `${shape.size}px`,
       height: `${shape.size}px`,
-      opacity: shape.active ? 0.7 : 0,
-      transform: `translate(-50%, -50%) rotate(${shape.rotation}deg) scale(${shape.scale})`,
+      opacity: activation * 0.7,
+      transform: `translate(-50%, -50%) rotate(${shape.rotation}deg) scale(${shape.scale ?? 1})`,
       position: 'absolute',
       pointerEvents: 'none',
       zIndex: 1,
-      transition: shape.active 
-        ? 'all 0.2s ease-out' 
-        : 'opacity 0.3s ease-out, transform 0.4s ease-out',
+      transition: 'opacity 0.6s ease-out, transform 0.6s ease-out',
       transformOrigin: 'center',
     };
 
@@ -346,7 +414,10 @@ const Hero = () => {
       
       {/* Ripples - behind content */}
       <div className="ripples-container">
-        {ripples.map((ripple) => (
+        {ripples.map((ripple) => {
+          const normalizedProgress = Math.min(Math.max(ripple.progress, 0), 1);
+          const easedFade = 1 - Math.pow(normalizedProgress, 1.5);
+          return (
           <div
             key={ripple.id}
             className="ripple"
@@ -355,11 +426,12 @@ const Hero = () => {
               top: `${ripple.y}px`,
               width: `${ripple.size}px`,
               height: `${ripple.size}px`,
-              transform: `translate(-50%, -50%) scale(${ripple.progress * 15})`,
-              opacity: 0.3 * (1 - ripple.progress),
+              transform: `translate(-50%, -50%) scale(${normalizedProgress * 15})`,
+              opacity: Math.max(0, 0.28 * easedFade),
             }}
           />
-        ))}
+        );
+        })}
       </div>
 
       {/* Content */}
@@ -376,11 +448,11 @@ const Hero = () => {
         </div>
 
         <div className="name-section">
-          <h1 className="name-animation" ref={nameRef}>
-            <span className="light-text"> I'm </span>
+          <h1 id="hero-heading" className="name-animation" ref={nameRef}>
+            <span className="resume-text-style"> THIS IS </span>
             <br />
             <span className="bold-text">
-              {"Vishnu Vardhan".split("").map((letter, index) => (
+              {"VISHNU VARDHAN".split("").map((letter, index) => (
                 <span key={index} className="letter">
                   {letter}
                 </span>
@@ -405,18 +477,27 @@ const Hero = () => {
                 </svg>
               </div>
             </button>
-            
-            <button className="btn-resume" onClick={downloadResume}>
-              <span>Download Resume</span>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M21 15V16.2C21 17.8802 21 18.7202 20.673 19.362C20.3854 19.9265 19.9265 20.3854 19.362 20.673C18.7202 21 17.8802 21 16.2 21H7.8C6.11984 21 5.27976 21 4.63803 20.673C4.07354 20.3854 3.6146 19.9265 3.32698 19.362C3 18.7202 3 17.8802 3 16.2V15M17 10L12 15M12 15L7 10M12 15V3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            {/* Resume Download Button - Mobile Only */}
+            <button className="btn-resume-mobile" onClick={downloadResume}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
               </svg>
+              <span>Download Resume</span>
             </button>
           </div>
         </div>
       </div>
+
+      {/* Resume Text - Bottom Right Corner, Vertical */}
+      <div className="resume-text-container" onClick={downloadResume}>
+        <div className="resume-text">RESUME</div>
+      </div>
     </section>
   );
-};
+});
+
+Hero.displayName = 'Hero';
 
 export default Hero;
