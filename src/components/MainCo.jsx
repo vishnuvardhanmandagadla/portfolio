@@ -133,19 +133,11 @@ const PortfolioSections = memo(({ containerRef, scrollTarget, isLoaderDone }) =>
     if (!targetSection) return;
 
     if (scroll && typeof scroll.scrollTo === 'function') {
-      // Update scroll limits before navigating
-      scroll.update();
-
-      setTimeout(() => {
-        scroll.scrollTo(targetSection, {
-          offset: 0,
-          duration: 1200,
-          easing: [0.25, 0.0, 0.35, 1.0],
-          callback: () => {
-            setTimeout(() => scroll.update(), 100);
-          }
-        });
-      }, 50);
+      scroll.scrollTo(targetSection, {
+        offset: 0,
+        duration: 800,
+        disableLerp: true,
+      });
     } else {
       targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -165,8 +157,8 @@ const PortfolioSections = memo(({ containerRef, scrollTarget, isLoaderDone }) =>
     if (scroll && typeof scroll.scrollTo === 'function') {
       scroll.scrollTo(contactSection, {
         offset: 0,
-        duration: 1200,
-        easing: [0.25, 0.0, 0.35, 1.0],
+        duration: 800,
+        disableLerp: true,
       });
     } else {
       contactSection.scrollIntoView({
