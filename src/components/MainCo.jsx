@@ -377,12 +377,12 @@ const MainCo = ({ isLoaderDone }) => {
       <LocomotiveScrollProvider
         options={{
           smooth: enableSmoothScroll,
-          lerp: enableSmoothScroll ? 0.1 : 1,
-          multiplier: 1,
+          lerp: enableSmoothScroll ? 0.05 : 1,
+          multiplier: 0.5,
           class: 'is-inview',
           getDirection: true,
           resetNativeScroll: true,
-          firefoxMultiplier: 50,
+          firefoxMultiplier: 25,
           touchMultiplier: 2.5,
           scrollFromAnywhere: false,
           reloadOnContextChange: false,
