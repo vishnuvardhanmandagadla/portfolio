@@ -760,3 +760,160 @@
     display: none;
   }
 }
+
+/* ============================================
+   LOCAL FOG CURTAIN FOR FULLSCREEN TRANSITION
+   Same style as global fog, but inside container
+   ============================================ */
+
+.solar-fog-curtain {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99999;
+  pointer-events: none;
+  overflow: hidden;
+  background: transparent;
+}
+
+.solar-fog-solid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgb(225, 180, 205);
+  opacity: 0;
+  z-index: 1;
+}
+
+.solar-fog-curtain.full .solar-fog-solid {
+  opacity: 1;
+}
+
+.solar-fog-curtain.exit .solar-fog-solid {
+  opacity: 1;
+  animation: solarFadeOutCover 0.6s ease-out 0.1s forwards;
+}
+
+@keyframes solarFadeOutCover {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.solar-fog-layer {
+  position: absolute;
+  top: -10%;
+  left: -20%;
+  width: 180%;
+  height: 120%;
+  transform: translateX(-100%);
+}
+
+.solar-fog-layer-1 {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(225, 180, 205, 1) 10%,
+    rgba(225, 180, 205, 1) 90%,
+    transparent 100%
+  );
+  filter: blur(25px);
+}
+
+.solar-fog-layer-2 {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(225, 180, 205, 1) 15%,
+    rgba(225, 180, 205, 1) 85%,
+    transparent 100%
+  );
+  filter: blur(35px);
+}
+
+.solar-fog-layer-3 {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(225, 180, 205, 1) 20%,
+    rgba(225, 180, 205, 1) 80%,
+    transparent 100%
+  );
+  filter: blur(45px);
+}
+
+/* Enter animations */
+.solar-fog-curtain.enter .solar-fog-layer-1 {
+  animation: solarSmokeEnter 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.solar-fog-curtain.enter .solar-fog-layer-2 {
+  animation: solarSmokeEnter 0.55s cubic-bezier(0.4, 0, 0.2, 1) 0.03s forwards;
+}
+
+.solar-fog-curtain.enter .solar-fog-layer-3 {
+  animation: solarSmokeEnter 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.06s forwards;
+}
+
+@keyframes solarSmokeEnter {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  20% { opacity: 0.5; }
+  50% { opacity: 0.9; }
+  100% {
+    transform: translateX(0%);
+    opacity: 1;
+  }
+}
+
+/* Full state */
+.solar-fog-curtain.full .solar-fog-layer {
+  transform: translateX(0%);
+  opacity: 1;
+}
+
+/* Exit animations */
+.solar-fog-curtain.exit .solar-fog-layer-1 {
+  animation: solarSmokeExit 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.solar-fog-curtain.exit .solar-fog-layer-2 {
+  animation: solarSmokeExit 0.65s cubic-bezier(0.4, 0, 0.2, 1) 0.03s forwards;
+}
+
+.solar-fog-curtain.exit .solar-fog-layer-3 {
+  animation: solarSmokeExit 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.06s forwards;
+}
+
+@keyframes solarSmokeExit {
+  0% {
+    transform: translateX(0%);
+    opacity: 1;
+  }
+  50% { opacity: 0.9; }
+  80% { opacity: 0.5; }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* Mobile adjustments for local fog */
+@media (max-width: 768px) {
+  .solar-fog-layer-1 { filter: blur(60px); }
+  .solar-fog-layer-2 { filter: blur(40px); }
+  .solar-fog-layer-3 { filter: blur(25px); }
+
+  .solar-fog-curtain.enter .solar-fog-layer-1 { animation-duration: 1s; }
+  .solar-fog-curtain.enter .solar-fog-layer-2 { animation-duration: 0.9s; }
+  .solar-fog-curtain.enter .solar-fog-layer-3 { animation-duration: 0.8s; }
+
+  .solar-fog-curtain.exit .solar-fog-layer-1 { animation-duration: 1.1s; }
+  .solar-fog-curtain.exit .solar-fog-layer-2 { animation-duration: 1s; }
+  .solar-fog-curtain.exit .solar-fog-layer-3 { animation-duration: 0.9s; }
+}

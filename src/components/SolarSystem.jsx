@@ -1,5 +1,6 @@
 import { useEffect, useRef, useMemo, useState } from 'react';
 import * as THREE from 'three';
+import { usePageTransition } from '../App';
 import './SolarSystem.css';
 
 const SolarSystem = () => {
@@ -8,11 +9,16 @@ const SolarSystem = () => {
   const animationFrameRef = useRef(null);
   const clockRef = useRef(new THREE.Clock());
   const isVisibleRef = useRef(true);
+  const transition = usePageTransition();
 
   // Expansion state - initially collapsed
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Local fog transition state (for fullscreen support)
+  const [showLocalFog, setShowLocalFog] = useState(false);
+  const [localFogPhase, setLocalFogPhase] = useState('');
 
   // Cinematic intro state
   const [introComplete, setIntroComplete] = useState(false);
@@ -49,40 +55,52 @@ const SolarSystem = () => {
     };
   }, []);
 
-  // Handle expand button click - direct fullscreen without animation jerk
+  // Handle expand button click - with local fog transition then fullscreen
   const handleExpand = async () => {
     const container = document.querySelector('.solar-system-container');
 
-    if (container) {
-      try {
-        // Request fullscreen immediately
-        if (container.requestFullscreen) {
-          await container.requestFullscreen();
-        } else if (container.webkitRequestFullscreen) {
-          await container.webkitRequestFullscreen();
-        } else if (container.msRequestFullscreen) {
-          await container.msRequestFullscreen();
+    // Start local fog transition
+    setShowLocalFog(true);
+    setLocalFogPhase('enter');
+
+    // Fog fully covers screen
+    setTimeout(async () => {
+      setLocalFogPhase('full');
+
+      // Request fullscreen and start experience
+      if (container) {
+        try {
+          if (container.requestFullscreen) {
+            await container.requestFullscreen();
+          } else if (container.webkitRequestFullscreen) {
+            await container.webkitRequestFullscreen();
+          } else if (container.msRequestFullscreen) {
+            await container.msRequestFullscreen();
+          }
+        } catch (err) {
+          console.log('Fullscreen request failed:', err);
         }
-
-        // After fullscreen is active, start the animation and 3D scene
-        setIsAnimating(true);
-
-        // Small delay to let fullscreen settle, then show 3D scene
-        setTimeout(() => {
-          setIsExpanded(true);
-          // Reset clock when starting
-          clockRef.current = new THREE.Clock();
-        }, 300);
-      } catch (err) {
-        console.log('Fullscreen request failed:', err);
-        // Fallback: still show the experience even if fullscreen fails
-        setIsAnimating(true);
-        setTimeout(() => {
-          setIsExpanded(true);
-          clockRef.current = new THREE.Clock();
-        }, 300);
       }
-    }
+
+      // Start animation and 3D scene
+      setIsAnimating(true);
+
+      setTimeout(() => {
+        setIsExpanded(true);
+        clockRef.current = new THREE.Clock();
+
+        // Start exit animation
+        setTimeout(() => {
+          setLocalFogPhase('exit');
+
+          // Remove fog after exit animation
+          setTimeout(() => {
+            setShowLocalFog(false);
+            setLocalFogPhase('');
+          }, 800);
+        }, 300);
+      }, 200);
+    }, 600);
   };
 
   // Handle exit fullscreen
@@ -1131,6 +1149,16 @@ const SolarSystem = () => {
 
   return (
     <div className={`solar-system-container ${isAnimating ? 'expanding' : ''} ${isExpanded ? 'expanded' : 'collapsed'}`}>
+      {/* Local Fog Curtain for fullscreen transition */}
+      {showLocalFog && (
+        <div className={`solar-fog-curtain ${localFogPhase}`}>
+          <div className="solar-fog-solid" />
+          <div className="solar-fog-layer solar-fog-layer-1" />
+          <div className="solar-fog-layer solar-fog-layer-2" />
+          <div className="solar-fog-layer solar-fog-layer-3" />
+        </div>
+      )}
+
       {/* Initial collapsed state - Explore button */}
       {!isExpanded && (
         <div className="solar-system-intro">
