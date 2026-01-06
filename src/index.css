@@ -298,8 +298,8 @@ iframe {
 }*/
 
 /* ============================================
-   FOG CURTAIN PAGE TRANSITION
-   Light pink fog with soft gradient edges
+   SMOKE CURTAIN PAGE TRANSITION
+   Soft smoke effect with no sharp edges
    ============================================ */
 
 .fog-curtain {
@@ -311,81 +311,109 @@ iframe {
   z-index: 99999;
   pointer-events: none;
   overflow: hidden;
+  background: transparent;
 }
 
-/* Multiple fog layers for depth and softness */
-.fog-layer {
+/* Solid cover layer - prevents any blink during navigation */
+.fog-solid-cover {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+  background: rgb(225, 180, 205);
+  opacity: 0;
+  z-index: 1;
+}
+
+.fog-curtain.full .fog-solid-cover {
+  opacity: 1;
+}
+
+.fog-curtain.exit .fog-solid-cover {
+  opacity: 1;
+  animation: fadeOutCover 0.6s ease-out 0.1s forwards;
+}
+
+@keyframes fadeOutCover {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+
+/* Multiple smoke layers for depth and softness */
+.fog-layer {
+  position: absolute;
+  top: -10%;
+  left: -20%;
+  width: 180%;
+  height: 120%;
   transform: translateX(-100%);
 }
 
-/* First layer - lightest, fastest */
+/* First layer - solid base layer */
 .fog-layer-1 {
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(253, 242, 246, 0.3) 10%,
-    rgba(248, 215, 230, 0.5) 30%,
-    rgba(248, 215, 230, 0.7) 50%,
-    rgba(240, 196, 216, 0.85) 70%,
-    rgba(232, 196, 212, 0.95) 85%,
-    #f8d7e6 100%
+    rgba(225, 180, 205, 1) 10%,
+    rgba(225, 180, 205, 1) 90%,
+    transparent 100%
   );
-  filter: blur(40px);
+  filter: blur(25px);
 }
 
-/* Second layer - medium, main body */
+/* Second layer - same color, more blur */
 .fog-layer-2 {
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(248, 215, 230, 0.2) 5%,
-    rgba(240, 196, 216, 0.4) 20%,
-    rgba(232, 196, 212, 0.6) 40%,
-    rgba(212, 168, 188, 0.8) 60%,
-    rgba(153, 77, 116, 0.15) 75%,
-    #f0c4d8 90%,
-    #f8d7e6 100%
+    rgba(225, 180, 205, 1) 15%,
+    rgba(225, 180, 205, 1) 85%,
+    transparent 100%
   );
-  filter: blur(20px);
+  filter: blur(35px);
 }
 
-/* Third layer - most solid, slowest */
+/* Third layer - same color, most blur for soft edges */
 .fog-layer-3 {
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(253, 242, 246, 0.1) 3%,
-    rgba(248, 215, 230, 0.3) 15%,
-    rgba(248, 215, 230, 0.6) 35%,
-    #fdf2f6 55%,
-    #f8d7e6 70%,
-    #f0c4d8 85%,
-    #f8d7e6 100%
+    rgba(225, 180, 205, 1) 20%,
+    rgba(225, 180, 205, 1) 80%,
+    transparent 100%
   );
+  filter: blur(45px);
 }
 
-/* Enter animations - staggered for fog effect */
+/* Enter animations - staggered smoke drift with smooth easing */
 .fog-curtain.enter .fog-layer-1 {
-  animation: fogEnter 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: smokeEnter 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .fog-curtain.enter .fog-layer-2 {
-  animation: fogEnter 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.05s forwards;
+  animation: smokeEnter 0.55s cubic-bezier(0.4, 0, 0.2, 1) 0.03s forwards;
 }
 
 .fog-curtain.enter .fog-layer-3 {
-  animation: fogEnter 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.1s forwards;
+  animation: smokeEnter 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.06s forwards;
 }
 
-@keyframes fogEnter {
+@keyframes smokeEnter {
   0% {
     transform: translateX(-100%);
-    opacity: 0.8;
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.9;
   }
   100% {
     transform: translateX(0%);
@@ -393,61 +421,74 @@ iframe {
   }
 }
 
-/* Full state - fog covers screen */
+/* Full state - smoke covers screen completely */
 .fog-curtain.full .fog-layer {
   transform: translateX(0%);
   opacity: 1;
 }
 
-/* Exit animations - staggered reverse */
+/* Exit animations - smoke drifts away with smooth easing */
 .fog-curtain.exit .fog-layer-1 {
-  animation: fogExit 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.1s forwards;
+  animation: smokeExit 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .fog-curtain.exit .fog-layer-2 {
-  animation: fogExit 0.9s cubic-bezier(0.4, 0, 0.2, 1) 0.05s forwards;
+  animation: smokeExit 0.65s cubic-bezier(0.4, 0, 0.2, 1) 0.03s forwards;
 }
 
 .fog-curtain.exit .fog-layer-3 {
-  animation: fogExit 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: smokeExit 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.06s forwards;
 }
 
-@keyframes fogExit {
+@keyframes smokeExit {
   0% {
     transform: translateX(0%);
     opacity: 1;
   }
+  50% {
+    opacity: 0.9;
+  }
+  80% {
+    opacity: 0.5;
+  }
   100% {
     transform: translateX(100%);
-    opacity: 0.8;
+    opacity: 0;
   }
 }
 
 /* Mobile adjustments */
 @media (max-width: 768px) {
-  .fog-layer-1,
+  .fog-layer-1 {
+    filter: blur(60px);
+  }
+
   .fog-layer-2 {
+    filter: blur(40px);
+  }
+
+  .fog-layer-3 {
     filter: blur(25px);
   }
 
   .fog-curtain.enter .fog-layer-1 {
-    animation-duration: 0.5s;
+    animation-duration: 1s;
   }
 
   .fog-curtain.enter .fog-layer-2 {
-    animation-duration: 0.6s;
+    animation-duration: 0.9s;
   }
 
   .fog-curtain.enter .fog-layer-3 {
-    animation-duration: 0.7s;
+    animation-duration: 0.8s;
   }
 
   .fog-curtain.exit .fog-layer-1 {
-    animation-duration: 0.7s;
+    animation-duration: 1.1s;
   }
 
   .fog-curtain.exit .fog-layer-2 {
-    animation-duration: 0.8s;
+    animation-duration: 1s;
   }
 
   .fog-curtain.exit .fog-layer-3 {
