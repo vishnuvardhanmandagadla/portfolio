@@ -41,9 +41,13 @@ export default defineConfig({
         manualChunks: (id) => {
           // More granular code splitting for better caching and reduced unused code
           if (id.includes('node_modules')) {
-            // React core - most critical
-            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+            // React core - keep together to avoid version conflicts
+            if (id.includes('/react/') || id.includes('/react-dom/') || id.includes('scheduler')) {
               return 'react-vendor';
+            }
+            // React Router separate
+            if (id.includes('react-router')) {
+              return 'router-vendor';
             }
             // Animation libraries - split further
             if (id.includes('gsap') || id.includes('@gsap')) {
@@ -107,9 +111,15 @@ export default defineConfig({
     cssCodeSplit: true,
     // Reduce bundle size
     reportCompressedSize: true,
-    // Tree shaking
+    // Tree shaking - preserve React side effects
     treeshake: {
-      moduleSideEffects: false,
+      moduleSideEffects: (id) => {
+        // Preserve side effects for React and related packages
+        if (id.includes('react') || id.includes('react-dom') || id.includes('scheduler')) {
+          return true;
+        }
+        return false;
+      },
     },
   },
 })
