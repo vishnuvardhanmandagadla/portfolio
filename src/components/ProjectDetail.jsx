@@ -52,10 +52,9 @@ const ProjectDetail = () => {
         />
         <motion.main
           className="project-detail__container project-detail__container--missing"
-          initial={{ opacity: 0 }}
+          initial={{ opacity: 1 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={transition}
+          exit={{ opacity: 1 }}
         >
           <section className="project-detail__shell project-detail__shell--empty">
             <div className="not-found__icon">
@@ -98,10 +97,9 @@ const ProjectDetail = () => {
       />
     <motion.main
       className="project-detail__container"
-      initial={{ opacity: 0 }}
+      initial={{ opacity: 1 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={transition}
+      exit={{ opacity: 1 }}
     >
       {/* Watermark Text */}
       <div className="project-detail__watermark">PROJECT</div>

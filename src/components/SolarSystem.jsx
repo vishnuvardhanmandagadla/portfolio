@@ -1,4 +1,5 @@
 import { useEffect, useRef, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import * as THREE from 'three';
 import { usePageTransition } from '../App';
 import './SolarSystem.css';
@@ -21,17 +22,12 @@ const SolarSystem = () => {
   const [showTitle, setShowTitle] = useState(false);
   const skipIntroRef = useRef(false);
 
-  // Handle fullscreen change events
+  // Handle ESC key to exit CSS fullscreen
   useEffect(() => {
-    const handleFullscreenChange = () => {
-      const fullscreenElement = document.fullscreenElement ||
-                                document.webkitFullscreenElement ||
-                                document.msFullscreenElement;
-      const isNowFullscreen = !!fullscreenElement;
-      setIsFullscreen(isNowFullscreen);
-
-      // Reset states when exiting fullscreen to show banner again
-      if (!isNowFullscreen) {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isFullscreen) {
+        // Exit CSS fullscreen mode
+        setIsFullscreen(false);
         setIsExpanded(false);
         setIsAnimating(false);
         setIntroComplete(false);
@@ -40,56 +36,51 @@ const SolarSystem = () => {
       }
     };
 
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-    document.addEventListener('msfullscreenchange', handleFullscreenChange);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isFullscreen]);
 
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
-      document.removeEventListener('msfullscreenchange', handleFullscreenChange);
-    };
-  }, []);
-
-  // Handle expand button click - use global fog transition
+  // Handle expand button click - with fog transition
   const handleExpand = () => {
-    const launchExperience = () => {
-      // Use CSS fullscreen mode (fixed positioning)
+    if (transition?.triggerTransition) {
+      transition.triggerTransition(() => {
+        // This runs when fog is solid - launch the experience
+        setIsFullscreen(true);
+        setIsAnimating(true);
+        setTimeout(() => {
+          setIsExpanded(true);
+          clockRef.current = new THREE.Clock();
+        }, 100);
+      });
+    } else {
+      // Fallback without transition
       setIsFullscreen(true);
       setIsAnimating(true);
-
-      // Small delay to let CSS transition settle, then show 3D scene
       setTimeout(() => {
         setIsExpanded(true);
-        // Reset clock when starting
         clockRef.current = new THREE.Clock();
-      }, 300);
-    };
-
-    // Use global fog transition
-    if (transition?.triggerTransition) {
-      transition.triggerTransition(launchExperience);
-    } else {
-      launchExperience();
+      }, 100);
     }
   };
 
-  // Handle exit fullscreen - use global fog transition
+  // Handle exit fullscreen - with fog transition
   const handleExitFullscreen = () => {
-    const exitExperience = () => {
+    if (transition?.triggerTransition) {
+      transition.triggerTransition(() => {
+        setIsFullscreen(false);
+        setIsExpanded(false);
+        setIsAnimating(false);
+        setIntroComplete(false);
+        setShowTitle(false);
+        skipIntroRef.current = false;
+      });
+    } else {
       setIsFullscreen(false);
       setIsExpanded(false);
       setIsAnimating(false);
       setIntroComplete(false);
       setShowTitle(false);
       skipIntroRef.current = false;
-    };
-
-    // Use global fog transition for exit too
-    if (transition?.triggerTransition) {
-      transition.triggerTransition(exitExperience);
-    } else {
-      exitExperience();
     }
   };
 
@@ -1126,10 +1117,87 @@ const SolarSystem = () => {
     };
   }, [themeColors, isExpanded]);
 
+  // Fullscreen content rendered via portal to body
+  const fullscreenContent = isAnimating ? createPortal(
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100vw',
+        height: '100vh',
+        minHeight: '100vh',
+        zIndex: 99998,
+        background: '#ffffff',
+        overflow: 'hidden',
+        margin: 0,
+        padding: 0
+      }}
+    >
+      {/* 3D Canvas */}
+      <div
+        ref={containerRef}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          width: '100vw',
+          height: '100vh',
+          background: '#ffffff',
+          overflow: 'hidden'
+        }}
+      />
+
+      {/* Cinematic letterbox bars */}
+      <div className={`letterbox letterbox-top ${introComplete ? 'letterbox-hidden' : ''}`} />
+      <div className={`letterbox letterbox-bottom ${introComplete ? 'letterbox-hidden' : ''}`} />
+
+      {/* Title overlay */}
+      <div className="solar-system-overlay">
+        <div className={`solar-system-title ${showTitle ? 'title-visible' : ''}`}>
+          <span className="title-light">Exploring the</span>
+          <span className="title-bold">UNIVERSE</span>
+        </div>
+      </div>
+
+      {/* Skip intro button */}
+      {!introComplete && isExpanded && (
+        <button
+          className="skip-intro-btn"
+          onClick={() => {
+            skipIntroRef.current = true;
+            setIntroComplete(true);
+            setShowTitle(true);
+          }}
+        >
+          Skip
+        </button>
+      )}
+
+      {/* Exit button */}
+      <button
+        className="exit-fullscreen-btn"
+        onClick={handleExitFullscreen}
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
+        </svg>
+      </button>
+    </div>,
+    document.body
+  ) : null;
+
   return (
-    <div className={`solar-system-container ${isAnimating ? 'expanding' : ''} ${isExpanded ? 'expanded' : 'collapsed'} ${isFullscreen ? 'css-fullscreen' : ''}`}>
+    <div className="solar-system-container collapsed">
+      {/* Fullscreen via portal */}
+      {fullscreenContent}
+
       {/* Initial collapsed state - Explore button */}
-      {!isExpanded && (
+      {!isAnimating && (
         <div className="solar-system-intro">
           <div className="intro-content">
             <div className="intro-text">
@@ -1205,55 +1273,6 @@ const SolarSystem = () => {
         </div>
       )}
 
-      {/* Expanded state - 3D Solar System */}
-      {isAnimating && (
-        <>
-          {/* Cinematic fade overlay */}
-          <div className={`cinematic-fade ${introComplete ? 'fade-complete' : ''}`} />
-
-          {/* Letterbox bars */}
-          <div className={`letterbox letterbox-top ${introComplete ? 'letterbox-hidden' : ''}`} />
-          <div className={`letterbox letterbox-bottom ${introComplete ? 'letterbox-hidden' : ''}`} />
-
-          {/* 3D Canvas */}
-          <div ref={containerRef} className="solar-system-canvas" />
-
-          {/* Title overlay */}
-          <div className="solar-system-overlay">
-            <div className={`solar-system-title ${showTitle ? 'title-visible' : ''}`}>
-              <span className="title-light">Exploring the</span>
-              <span className="title-bold">UNIVERSE</span>
-            </div>
-          </div>
-
-          {/* Skip intro button */}
-          {!introComplete && isExpanded && (
-            <button
-              className="skip-intro-btn"
-              onClick={() => {
-                skipIntroRef.current = true;
-                setIntroComplete(true);
-                setShowTitle(true);
-              }}
-            >
-              Skip
-            </button>
-          )}
-
-          {/* Exit fullscreen button */}
-          {isFullscreen && (
-            <button
-              className="exit-fullscreen-btn"
-              onClick={handleExitFullscreen}
-              title="Exit Fullscreen (ESC)"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
-              </svg>
-            </button>
-          )}
-        </>
-      )}
     </div>
   );
 };

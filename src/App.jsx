@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, Suspense, lazy } from "react";
+import React, { useEffect, useState, useRef, Suspense, lazy, useCallback, createContext, useContext } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import "./App.css";
@@ -9,6 +9,24 @@ import SEO from "./components/SEO";
 import { getResourcePreloader } from "./utils/resourcePreloader";
 import { useNetworkStatus } from "./hooks/useNetworkStatus";
 import { generatePersonSchema, generateWebsiteSchema } from "./utils/structuredData";
+
+// Page Transition Context - allows triggering transition from anywhere
+const PageTransitionContext = createContext(null);
+export const usePageTransition = () => useContext(PageTransitionContext);
+
+// Fog Curtain Transition Component
+const FogCurtain = ({ isActive, phase }) => {
+  if (!isActive) return null;
+
+  return (
+    <div className={`fog-curtain ${phase}`}>
+      <div className="fog-solid-cover" />
+      <div className="fog-layer fog-layer-1" />
+      <div className="fog-layer fog-layer-2" />
+      <div className="fog-layer fog-layer-3" />
+    </div>
+  );
+};
 // Import assets statically - Vite will process these and provide the correct URLs
 import logoImage from "./assets/vvlogo.png";
 import resumePDF from "./assets/Vishnu_Resume.pdf";
@@ -63,7 +81,7 @@ const AppRoutes = ({ isLoaderDone, setCurrentLocation }) => {
         structuredData={location.pathname === '/' ? homepageStructuredData : undefined}
       />
       
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="sync">
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<MainCo isLoaderDone={isLoaderDone} />} />
           <Route 
@@ -117,8 +135,41 @@ function App() {
   const networkErrorPreloadedRef = useRef(false);
   const animationFrameRef = useRef(null);
   const resourcesLoadedRef = useRef(false);
-  
+
+  // Fog curtain transition state
+  const [showFog, setShowFog] = useState(false);
+  const [fogPhase, setFogPhase] = useState('');
+
   const { isOnline } = useNetworkStatus();
+
+  // Trigger page transition with callback
+  const triggerTransition = useCallback((onNavigate) => {
+    setShowFog(true);
+    setFogPhase('enter');
+
+    // Fog fully covers screen
+    setTimeout(() => {
+      setFogPhase('full');
+
+      // Navigate when solid cover is active - no blink possible
+      setTimeout(() => {
+        if (onNavigate) {
+          onNavigate();
+        }
+      }, 100);
+
+      // Start exit after page loads
+      setTimeout(() => {
+        setFogPhase('exit');
+
+        // Remove fog after animation
+        setTimeout(() => {
+          setShowFog(false);
+          setFogPhase('');
+        }, 800);
+      }, 500);
+    }, 600);
+  }, []);
   
   // Check if we're on project detail page
   const isProjectDetailPage = currentLocation.startsWith('/projects/');
@@ -478,15 +529,20 @@ function App() {
   }
 
   return (
-    <Router>
-      <div className={`App ${phase !== "done" ? "App--loading" : ""}`}>
-        <div className={`App__content ${isContentOpen ? "App__content--open" : ""}`}>
-          <AppRoutes isLoaderDone={isLoaderDone} setCurrentLocation={setCurrentLocation} />
+    <PageTransitionContext.Provider value={{ triggerTransition }}>
+      <Router>
+        <div className={`App ${phase !== "done" ? "App--loading" : ""}`}>
+          <div className={`App__content ${isContentOpen ? "App__content--open" : ""}`}>
+            <AppRoutes isLoaderDone={isLoaderDone} setCurrentLocation={setCurrentLocation} />
+          </div>
+          {!shouldSkipLoader && <PageLoader phase={phase} progress={progress} />}
+          {!isProjectDetailPage && <SocialIcons isLoaderDone={showIcons} />}
         </div>
-        {!shouldSkipLoader && <PageLoader phase={phase} progress={progress} />}
-        {!isProjectDetailPage && <SocialIcons isLoaderDone={showIcons} />}
-      </div>
-    </Router>
+
+        {/* Fog Curtain Transition - Full screen, persists across routes */}
+        <FogCurtain isActive={showFog} phase={fogPhase} />
+      </Router>
+    </PageTransitionContext.Provider>
   );
 }
 

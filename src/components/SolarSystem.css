@@ -69,11 +69,21 @@
   min-height: 100vh;
   z-index: 9999;
   background-color: #ffffff;
+  display: block;
+  overflow: hidden;
+}
+
+.solar-system-container.css-fullscreen .solar-system-intro {
+  display: none;
 }
 
 .solar-system-container.css-fullscreen .solar-system-canvas {
   width: 100vw;
   height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 1;
 }
 
 /* ============================================
@@ -335,8 +345,7 @@
   left: 0;
   cursor: grab;
   touch-action: none;
-  opacity: 0;
-  animation: canvasFadeIn 0.5s ease-out 0.1s forwards;
+  opacity: 1;
   z-index: 1;
 }
 

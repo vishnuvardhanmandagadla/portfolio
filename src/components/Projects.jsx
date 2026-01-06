@@ -4,14 +4,27 @@ import { useNavigate } from "react-router-dom";
 import { useInView } from "react-intersection-observer";
 import { FaArrowRight } from "react-icons/fa";
 import { projects } from "../data/projects";
+import { usePageTransition } from "../App";
 import "./Projects.css";
 
 const Projects = () => {
   const navigate = useNavigate();
+  const transition = usePageTransition();
   const { ref, inView } = useInView({
     triggerOnce: true,
     threshold: 0.7,
   });
+
+  // Navigate with fog transition
+  const handleProjectClick = (slug) => {
+    if (transition?.triggerTransition) {
+      transition.triggerTransition(() => {
+        navigate(`/projects/${slug}`);
+      });
+    } else {
+      navigate(`/projects/${slug}`);
+    }
+  };
 
   return (
     <div className="project-container relative py-24" ref={ref}>
@@ -68,7 +81,7 @@ const Projects = () => {
           >
             <FlipLink
               label={project.title}
-              onClick={() => navigate(`/projects/${project.slug}`)}
+              onClick={() => handleProjectClick(project.slug)}
             />
           </motion.div>
         ))}
