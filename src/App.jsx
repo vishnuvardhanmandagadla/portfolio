@@ -15,12 +15,32 @@ const PageTransitionContext = createContext(null);
 export const usePageTransition = () => useContext(PageTransitionContext);
 
 // Fog Curtain Transition Component
-const FogCurtain = ({ isActive, phase }) => {
+const transitionMessages = [
+  "Let's Go",
+  "Almost There",
+  "Hold Tight",
+  "Ready?",
+  "Here We Go",
+  "Stay Tuned",
+  "Magic Loading",
+  "One Moment",
+  "Buckle Up",
+  "Get Ready"
+];
+
+const FogCurtain = ({ isActive, phase, reverse }) => {
+  const [message] = useState(() =>
+    transitionMessages[Math.floor(Math.random() * transitionMessages.length)]
+  );
+
   if (!isActive) return null;
 
   return (
-    <div className={`fog-curtain ${phase}`}>
+    <div className={`fog-curtain ${phase} ${reverse ? 'reverse' : ''}`}>
       <div className="fog-solid-cover" />
+      <div className="fog-text">
+        <span>{message}</span>
+      </div>
       <div className="fog-layer fog-layer-1" />
       <div className="fog-layer fog-layer-2" />
       <div className="fog-layer fog-layer-3" />
@@ -139,12 +159,14 @@ function App() {
   // Fog curtain transition state
   const [showFog, setShowFog] = useState(false);
   const [fogPhase, setFogPhase] = useState('');
+  const [fogReverse, setFogReverse] = useState(false);
 
   const { isOnline } = useNetworkStatus();
 
-  // Trigger page transition with callback
-  const triggerTransition = useCallback((onNavigate) => {
+  // Trigger page transition with callback (reverse = true for back navigation)
+  const triggerTransition = useCallback((onNavigate, reverse = false) => {
     setShowFog(true);
+    setFogReverse(reverse);
     setFogPhase('enter');
 
     // Fog fully covers screen
@@ -166,6 +188,7 @@ function App() {
         setTimeout(() => {
           setShowFog(false);
           setFogPhase('');
+          setFogReverse(false);
         }, 800);
       }, 500);
     }, 600);
@@ -199,7 +222,7 @@ function App() {
     preloader.addComponent(() => import('./components/Projects'), 'Projects', true);
     preloader.addComponent(() => import('./components/Contacts'), 'Contacts', true);
     preloader.addComponent(() => import('./components/video'), 'Video', true);
-    preloader.addComponent(() => import('./components/SolarSystem'), 'SolarSystem', false);
+    preloader.addComponent(() => import('./components/3d/World3D'), 'World3D', false);
     preloader.addComponent(() => import('./components/Footer'), 'Footer', false);
     preloader.addComponent(() => import('./components/MouseFollower'), 'MouseFollower', false);
 
@@ -540,7 +563,7 @@ function App() {
         </div>
 
         {/* Fog Curtain Transition - Full screen, persists across routes */}
-        <FogCurtain isActive={showFog} phase={fogPhase} />
+        <FogCurtain isActive={showFog} phase={fogPhase} reverse={fogReverse} />
       </Router>
     </PageTransitionContext.Provider>
   );

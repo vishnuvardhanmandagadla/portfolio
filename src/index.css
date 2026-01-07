@@ -344,6 +344,121 @@ iframe {
   }
 }
 
+/* Fog transition text - simple fade with fog */
+.fog-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  pointer-events: none;
+  white-space: nowrap;
+  opacity: 0;
+}
+
+.fog-text span {
+  display: inline-block;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(1.8rem, 4vw, 3.5rem);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #34091e;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Text fades in with fog */
+.fog-curtain.enter .fog-text {
+  animation: textFadeIn 0.4s ease-out 0.2s forwards;
+}
+
+/* Text stays visible when fog is full */
+.fog-curtain.full .fog-text {
+  opacity: 1;
+}
+
+/* Text fades out with fog */
+.fog-curtain.exit .fog-text {
+  opacity: 1;
+  animation: textFadeOut 0.4s ease-in forwards;
+}
+
+@keyframes textFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes textFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Reverse: Fog layers enter from right */
+.fog-curtain.reverse .fog-layer {
+  transform: translateX(100%);
+}
+
+.fog-curtain.reverse.enter .fog-layer-1 {
+  animation: smokeEnterReverse 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.fog-curtain.reverse.enter .fog-layer-2 {
+  animation: smokeEnterReverse 0.55s cubic-bezier(0.4, 0, 0.2, 1) 0.03s forwards;
+}
+
+.fog-curtain.reverse.enter .fog-layer-3 {
+  animation: smokeEnterReverse 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.06s forwards;
+}
+
+@keyframes smokeEnterReverse {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateX(0%);
+    opacity: 1;
+  }
+}
+
+/* Reverse: Fog layers exit to left */
+.fog-curtain.reverse.exit .fog-layer-1 {
+  animation: smokeExitReverse 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.fog-curtain.reverse.exit .fog-layer-2 {
+  animation: smokeExitReverse 0.65s cubic-bezier(0.4, 0, 0.2, 1) 0.03s forwards;
+}
+
+.fog-curtain.reverse.exit .fog-layer-3 {
+  animation: smokeExitReverse 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.06s forwards;
+}
+
+@keyframes smokeExitReverse {
+  0% {
+    transform: translateX(0%);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.9;
+  }
+  80% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
 
 /* Multiple smoke layers for depth and softness */
 .fog-layer {

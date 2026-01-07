@@ -1,7 +1,7 @@
 import { useEffect, useRef, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import * as THREE from 'three';
-import { usePageTransition } from '../App';
+import { usePageTransition } from '../../App';
 import './SolarSystem.css';
 
 const SolarSystem = () => {
@@ -63,7 +63,7 @@ const SolarSystem = () => {
     }
   };
 
-  // Handle exit fullscreen - with fog transition
+  // Handle exit fullscreen - with fog transition (reverse direction)
   const handleExitFullscreen = () => {
     if (transition?.triggerTransition) {
       transition.triggerTransition(() => {
@@ -73,7 +73,7 @@ const SolarSystem = () => {
         setIntroComplete(false);
         setShowTitle(false);
         skipIntroRef.current = false;
-      });
+      }, true); // reverse = true for back/exit navigation
     } else {
       setIsFullscreen(false);
       setIsExpanded(false);
@@ -1216,56 +1216,96 @@ const SolarSystem = () => {
             <div className="intro-icon earth-moon-system">
               <svg viewBox="0 0 200 200" className="earth-moon-icon">
                 <defs>
-                  <linearGradient id="earthGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#802754" />
-                    <stop offset="50%" stopColor="#63133b" />
-                    <stop offset="100%" stopColor="#994D74" />
-                  </linearGradient>
-                  <linearGradient id="moonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#f8d7e6" />
-                    <stop offset="50%" stopColor="#e8c4d4" />
-                    <stop offset="100%" stopColor="#d4a8bc" />
-                  </linearGradient>
-                  <radialGradient id="earthShine" cx="30%" cy="30%" r="60%">
-                    <stop offset="0%" stopColor="#ffffff" stopOpacity="0.5" />
-                    <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+                  {/* Earth base gradient - realistic sphere shading */}
+                  <radialGradient id="earthBase" cx="30%" cy="30%" r="70%" fx="30%" fy="30%">
+                    <stop offset="0%" stopColor="#b37495" />
+                    <stop offset="50%" stopColor="#802754" />
+                    <stop offset="100%" stopColor="#3d1528" />
                   </radialGradient>
-                  <radialGradient id="moonShine" cx="30%" cy="30%" r="60%">
+
+                  {/* Earth atmosphere glow */}
+                  <radialGradient id="earthAtmosphere" cx="50%" cy="50%" r="50%">
+                    <stop offset="80%" stopColor="#994D74" stopOpacity="0" />
+                    <stop offset="90%" stopColor="#cc9ab5" stopOpacity="0.3" />
+                    <stop offset="100%" stopColor="#e8d0dc" stopOpacity="0.5" />
+                  </radialGradient>
+
+                  {/* Earth highlight */}
+                  <radialGradient id="earthHighlight" cx="25%" cy="25%" r="50%">
                     <stop offset="0%" stopColor="#ffffff" stopOpacity="0.6" />
                     <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
                   </radialGradient>
-                  <filter id="earthGlow" x="-50%" y="-50%" width="200%" height="200%">
-                    <feGaussianBlur stdDeviation="3" result="glow" />
+
+                  {/* Moon gradient */}
+                  <radialGradient id="moonGrad" cx="30%" cy="30%" r="70%" fx="30%" fy="30%">
+                    <stop offset="0%" stopColor="#f5e6ed" />
+                    <stop offset="50%" stopColor="#d4b8c7" />
+                    <stop offset="100%" stopColor="#a88799" />
+                  </radialGradient>
+
+                  {/* Moon highlight */}
+                  <radialGradient id="moonHighlight" cx="25%" cy="25%" r="50%">
+                    <stop offset="0%" stopColor="#ffffff" stopOpacity="0.7" />
+                    <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+                  </radialGradient>
+
+                  {/* Shadow filter */}
+                  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="2" dy="2" stdDeviation="3" floodColor="#3d1528" floodOpacity="0.3" />
+                  </filter>
+
+                  {/* Glow filter */}
+                  <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="2" result="blur" />
                     <feMerge>
-                      <feMergeNode in="glow" />
+                      <feMergeNode in="blur" />
                       <feMergeNode in="SourceGraphic" />
                     </feMerge>
                   </filter>
                 </defs>
 
-                {/* Orbit ring */}
+                {/* Orbit ellipse - behind Earth */}
                 <ellipse
                   cx="100"
                   cy="100"
-                  rx="85"
-                  ry="35"
+                  rx="80"
+                  ry="30"
                   fill="none"
                   stroke="#994D74"
-                  strokeWidth="1.5"
-                  strokeOpacity="0.4"
-                  strokeDasharray="8 4"
+                  strokeWidth="1"
+                  strokeOpacity="0.3"
                   transform="rotate(-20 100 100)"
-                  className="orbit-ring"
                 />
 
                 {/* Earth */}
-                <circle cx="100" cy="100" r="40" fill="url(#earthGrad)" filter="url(#earthGlow)" className="earth" />
-                <circle cx="100" cy="100" r="40" fill="url(#earthShine)" />
+                <g filter="url(#shadow)">
+                  {/* Atmosphere glow */}
+                  <circle cx="100" cy="100" r="42" fill="url(#earthAtmosphere)" />
 
-                {/* Moon on orbit */}
-                <g className="moon-group">
-                  <circle cx="180" cy="71" r="12" fill="url(#moonGrad)" className="moon" />
-                  <circle cx="180" cy="71" r="12" fill="url(#moonShine)" />
+                  {/* Earth sphere */}
+                  <circle cx="100" cy="100" r="38" fill="url(#earthBase)" />
+
+                  {/* Surface texture - subtle land masses */}
+                  <ellipse cx="90" cy="92" rx="10" ry="14" fill="#994D74" fillOpacity="0.3" />
+                  <ellipse cx="112" cy="105" rx="8" ry="10" fill="#994D74" fillOpacity="0.25" />
+                  <circle cx="95" cy="115" r="6" fill="#994D74" fillOpacity="0.2" />
+
+                  {/* Highlight */}
+                  <circle cx="100" cy="100" r="38" fill="url(#earthHighlight)" />
+                </g>
+
+                {/* Moon */}
+                <g filter="url(#glow)">
+                  {/* Moon sphere */}
+                  <circle cx="168" cy="72" r="12" fill="url(#moonGrad)" />
+
+                  {/* Moon craters */}
+                  <circle cx="164" cy="70" r="2.5" fill="#b8a0ac" fillOpacity="0.6" />
+                  <circle cx="171" cy="75" r="1.5" fill="#b8a0ac" fillOpacity="0.5" />
+                  <circle cx="166" cy="77" r="1" fill="#b8a0ac" fillOpacity="0.4" />
+
+                  {/* Moon highlight */}
+                  <circle cx="168" cy="72" r="12" fill="url(#moonHighlight)" />
                 </g>
               </svg>
             </div>

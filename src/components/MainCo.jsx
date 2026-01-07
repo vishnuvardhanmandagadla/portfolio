@@ -10,7 +10,7 @@ const BioSection = React.lazy(() => import('./BioSection'));
 const Skills = React.lazy(() => import('./Skills'));
 const Projects = React.lazy(() => import('./Projects'));
 const Contact = React.lazy(() => import('./Contacts'));
-const SolarSystem = React.lazy(() => import('./SolarSystem'));
+const World3D = React.lazy(() => import('./3d/World3D'));
 const Footer = React.lazy(() => import('./Footer'));
 const MouseFollower = React.lazy(() => import("./MouseFollower"));
 const Vido = React.lazy(() => import("./video"));
@@ -27,7 +27,7 @@ const SectionLoader = () => (
 );
 
 // Portfolio Sections Component - Contains all portfolio content
-const PortfolioSections = memo(({ containerRef, scrollTarget, isLoaderDone }) => {
+const PortfolioSections = memo(({ containerRef, scrollTarget, instantScroll, onScrollComplete, isLoaderDone }) => {
   const { scroll } = useLocomotiveScroll();
   const [deviceType, setDeviceType] = useState('desktop');
 
@@ -132,16 +132,27 @@ const PortfolioSections = memo(({ containerRef, scrollTarget, isLoaderDone }) =>
     const targetSection = document.getElementById(scrollTarget);
     if (!targetSection) return;
 
+    // Use instant scroll (duration: 0) when coming from page transition
+    const scrollDuration = instantScroll ? 0 : 800;
+
     if (scroll && typeof scroll.scrollTo === 'function') {
       scroll.scrollTo(targetSection, {
         offset: 0,
-        duration: 800,
+        duration: scrollDuration,
         disableLerp: true,
       });
     } else {
-      targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      targetSection.scrollIntoView({
+        behavior: instantScroll ? 'instant' : 'smooth',
+        block: 'start'
+      });
     }
-  }, [scrollTarget, scroll]);
+
+    // Clear scroll target and notify completion after scroll
+    if (onScrollComplete) {
+      onScrollComplete();
+    }
+  }, [scrollTarget, scroll, instantScroll, onScrollComplete]);
 
   const baseSectionStyles = useMemo(() => ({
     width: '100%',
@@ -282,16 +293,16 @@ const PortfolioSections = memo(({ containerRef, scrollTarget, isLoaderDone }) =>
           </React.Suspense>
         </section>
 
-        {/* Solar System Section */}
+        {/* 3D World Section */}
         <section
-          id="solar-system"
-          data-scroll-id="solar-system"
-          aria-label="Solar System Animation"
+          id="3d-world"
+          data-scroll-id="3d-world"
+          aria-label="3D World Experience"
           data-scroll-section
           style={baseSectionStyles}
         >
           <React.Suspense fallback={<SectionLoader />}>
-            <SolarSystem />
+            <World3D />
           </React.Suspense>
         </section>
 
@@ -332,6 +343,7 @@ const MainCo = ({ isLoaderDone }) => {
     return window.innerWidth > 768;
   });
   const [scrollTarget, setScrollTarget] = useState(null);
+  const [instantScroll, setInstantScroll] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -360,12 +372,23 @@ const MainCo = ({ isLoaderDone }) => {
     };
   }, []);
 
-  // Handle scroll target from route state
+  // Handle scroll target from route state - use instant scroll for page transitions
   useEffect(() => {
     if (!location.state?.scrollTo) return;
-    setScrollTarget(location.state.scrollTo);
+
+    const targetId = location.state.scrollTo;
+
+    // Clear the state immediately to prevent re-triggering
     navigate(location.pathname, { replace: true, state: null });
-  }, [location, navigate]);
+
+    // Small delay to ensure DOM is ready, then scroll
+    const scrollTimer = setTimeout(() => {
+      setInstantScroll(true);
+      setScrollTarget(targetId);
+    }, 50);
+
+    return () => clearTimeout(scrollTimer);
+  }, [location.state?.scrollTo, navigate]);
 
   return (
     <motion.div
@@ -402,6 +425,11 @@ const MainCo = ({ isLoaderDone }) => {
         <PortfolioSections
           containerRef={containerRef}
           scrollTarget={scrollTarget}
+          instantScroll={instantScroll}
+          onScrollComplete={() => {
+            setInstantScroll(false);
+            setScrollTarget(null);
+          }}
           isLoaderDone={isLoaderDone}
         />
       </LocomotiveScrollProvider>

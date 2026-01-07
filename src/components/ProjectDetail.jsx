@@ -5,6 +5,7 @@ import { FaArrowLeft, FaExternalLinkAlt, FaGithub, FaCode, FaRocket, FaLightbulb
 import { projects, getProjectBySlug } from "../data/projects";
 import SEO from "./SEO";
 import { generateBreadcrumbSchema } from "../utils/structuredData";
+import { usePageTransition } from "../App";
 import "./ProjectDetail.css";
 
 const transition = {
@@ -17,9 +18,17 @@ const ProjectDetail = () => {
   const { slug } = useParams();
   const project = getProjectBySlug(slug);
   const [activeTab, setActiveTab] = useState("overview");
+  const pageTransition = usePageTransition();
 
   const handleBack = () => {
-    navigate("/", { state: { scrollTo: "projects" } });
+    if (pageTransition?.triggerTransition) {
+      // Use reverse=true for back navigation (fog comes from right)
+      pageTransition.triggerTransition(() => {
+        navigate("/", { state: { scrollTo: "projects" } });
+      }, true);
+    } else {
+      navigate("/", { state: { scrollTo: "projects" } });
+    }
   };
 
   // Generate structured data for project page

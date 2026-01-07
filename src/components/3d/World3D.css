@@ -1,0 +1,29 @@
+/* World3D Container - Wrapper for 3D experiences */
+.world3d-container {
+  width: 100%;
+  position: relative;
+}
+
+/* Loading spinner for 3D components */
+.world3d-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  width: 100%;
+}
+
+.world3d-loader-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(128, 39, 84, 0.2);
+  border-top-color: #802754;
+  border-radius: 50%;
+  animation: world3d-spin 1s linear infinite;
+}
+
+@keyframes world3d-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
